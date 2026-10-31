@@ -65,3 +65,13 @@ HARNESS = ADAPTERS / 'harness.json'
 FIELD_MAPPING = ADAPTERS / 'field_mapping.json'
 PLATFORMS = ADAPTERS / 'platforms.json'
 COMPANIES = ADAPTERS / 'companies.json'
+
+# 外包岗判定标记（启发式；默认通用关键词，个人目标公司经环境变量或本地配置覆盖，不入库）
+_DEFAULT_OUTSOURCING_MARKERS = ('外包', '派遣', '劳务', 'od', 'od外包')
+_om = os.environ.get('OFFERLOOP_OUTSOURCING_MARKERS') or _cfg.get('outsourcing_markers')
+if isinstance(_om, str):
+    OUTSOURCING_MARKERS = tuple(m.strip() for m in _om.split(',') if m.strip())
+elif _om:
+    OUTSOURCING_MARKERS = tuple(_om)
+else:
+    OUTSOURCING_MARKERS = _DEFAULT_OUTSOURCING_MARKERS

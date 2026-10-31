@@ -11,7 +11,7 @@
     python -X utf8 scripts/chain.py apply    [--execute]   # 仅外包岗，默认 dry-run
     python -X utf8 scripts/chain.py run      # 串起来，全 dry-run
 
-边界（来自 harness.json boundary）：真实投递仅外包岗（外企德科/华为OD）；正编与「在考虑范围」岗只登记不真投。
+边界（来自 harness.json boundary）：真实投递仅外包岗（外包/派遣/OD 岗）；正编与「在考虑范围」岗只登记不真投。
 本脚本默认全部 dry-run，不真实投递、不真实打招呼。空参 / --help 打印本用法。
 """
 import argparse
@@ -27,13 +27,13 @@ import job_check
 from ready_list import build as build_ready
 
 SCRIPT = Path(__file__).resolve().parent
-from config import CHAIN_DIR
+from config import CHAIN_DIR, OUTSOURCING_MARKERS
 DEFAULT_JOBS = CHAIN_DIR / 'jobs.json'
 DEFAULT_CARDS = CHAIN_DIR / '证据卡'
 
 # 外包岗判定标记（小写比较，中文不受影响）。命中即视为外包、可 dry-run 投递测试；
 # 其余（正编 / 在考虑范围）只登记不投。判定为启发式，最终以实际劳动主体核验为准。
-OUTSOURCING_MARKERS = ('外企德科', '德科', '华为od', '华为 od', 'od外包')
+# OUTSOURCING_MARKERS 来自 config.py（默认通用关键词；个人目标公司经 OFFERLOOP_OUTSOURCING_MARKERS 或本地配置覆盖）
 
 
 def _text(payload):

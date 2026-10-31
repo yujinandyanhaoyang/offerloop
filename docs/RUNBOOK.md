@@ -212,7 +212,7 @@ Chrome对照增量：本人完成扩展安装，已实际连接Chrome用户1；�
 
 `pipeline.py complete <批次ID> <JSON文件>`：
 ```json
-{"job_ids":["APP-007"],"summary":"本轮公开检索结论","evidence":["本地调研记录路径"]}
+{"job_ids":["APP-xxx"],"summary":"本轮公开检索结论","evidence":["本地调研记录路径"]}
 ```
 超过租约或needs_review须另加`reconciliation`说明已核已有产物，不能盲目重跑。批次入库只是线索，不等于适合投递；最多3条，禁止拿旧岗位冒充新发现。
 
