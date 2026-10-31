@@ -1,0 +1,57 @@
+{
+  "boss": {
+    "name": "BOSS直聘",
+    "base_url": "https://www.zhipin.com",
+    "search_url": "https://www.zhipin.com/web/geek/jobs?query={kw}&city={city}",
+    "city_code": {
+      "杭州": "101210100",
+      "深圳": "101280600"
+    },
+    "card_anchor": "a.job-name",
+    "card_selector": "li",
+    "anchor_is_company": false,
+    "title_selector": "a.job-name",
+    "company_selector": ".boss-info",
+    "submit_selector": ".op-btn-chat",
+    "submit_kind": "chat",
+    "chat_url": "https://www.zhipin.com/web/geek/chat",
+    "allowed_hosts": [
+      "www.zhipin.com"
+    ]
+  },
+  "zhaopin": {
+    "name": "智联招聘",
+    "base_url": "https://www.zhaopin.com",
+    "search_url": "https://sou.zhaopin.com/?jl={city}&kw={kw}",
+    "city_code": {
+      "杭州": "653",
+      "深圳": "765"
+    },
+    "card_anchor": "a.job-card__company-name",
+    "card_selector": ".job-card",
+    "anchor_is_company": true,
+    "title_selector": "span.job-detail-summary__title-text",
+    "company_selector": "a.job-card__company-name",
+    "submit_selector": "button.a-button.a--bordered.a--filled",
+    "submit_kind": "apply",
+    "chat_url": "",
+    "allowed_hosts": [
+      "www.zhaopin.com",
+      "sou.zhaopin.com",
+      "i.zhaopin.com"
+    ]
+  },
+  "nowcoder": {
+    "name": "牛客",
+    "discovery_mode": "interface",
+    "base_url": "https://www.nowcoder.com",
+    "search_url": "https://www.nowcoder.com/jobs/recommend/campus",
+    "detail_url_pattern": "https://www.nowcoder.com/jobs/detail/{id}",
+    "submit_kind": "apply",
+    "chat_url": "",
+    "allowed_hosts": [
+      "www.nowcoder.com",
+      "nowcoder.com"
+    ]
+  }
+}

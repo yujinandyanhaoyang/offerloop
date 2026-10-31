@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "confirmed_on": "2026-10-31",
+  "responsibility_gate": "按本人方向线研究真实岗位责任与准入；不虚构经历。",
+  "ready_buffer": 3,
+  "batch_max_jobs": 3,
+  "batch_max_minutes": 15,
+  "discovery_interval_hours": 24,
+  "empty_twice_cooldown_hours": 72,
+  "productive_interval_hours": 0,
+  "search_window_months": 3,
+  "external_actions_enabled": false,
+  "screening_filter": {
+    "revision": "v1",
+    "required_company_checks": ["C1生态位与领先地位", "C2客户与真实需求", "C3增长真实性", "C4赚钱与现金", "C5团队与价值分配"],
+    "required_job_checks": ["J1业务责任", "J2可迁移积累", "J3资源与组织", "J4真实准入", "J5个人回报"],
+    "backcheck_method": "docs/企业背调方法论.md",
+    "value_chain_checks": ["产业链位置与价值分配", "上游/客户健康度", "终端需求与刚性", "结构性vs周期性", "AI替代风险", "草根/内部信号"],
+    "professional_checks": ["C6风险与合规", "C7岗位真实性与战略"],
+    "backcheck_red_lines": ["欠薪/欠社保/长期拖欠", "被执行/失信/经营异常未整改", "外包冒充正编或劳动主体不明", "核心业务涉传销/灰产/违规"],
+    "backcheck_staging": {
+      "screening": "C1-C5 + J1-J5 + JD 来源完整性；不做 C6 司法/C7 深度",
+      "deep": "全量三层x七维（含 C6/C7），逐项回原始披露与 HR 沟通",
+      "deep_trigger": "跨过简历沟通关、进入笔试/面试邀约",
+      "principle": "背调投入与招聘意愿信号成正比"
+    },
+    "communication_policy": {
+      "template": "docs/通用打招呼话术.md",
+      "rule": "一套通用话术+一套通用简历，不逐岗打磨；仅核心/强匹配岗微调"
+    }
+  },
+  "execution_contract": {
+    "unit_max_minutes": 15,
+    "unit_max_jobs": 3,
+    "external_send": false
+  }
+}

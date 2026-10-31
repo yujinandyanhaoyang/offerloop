@@ -1,0 +1,21 @@
+{
+  "_schema": "企业官网投递适配器配置。每个公司一个 key，含登录/岗位列表/投递选择器。凭据走 credential_store。选择器在真实官网 DOM 核对后填入。",
+  "meituan": {
+    "name": "美团",
+    "careers_url": "https://zhaopin.meituan.com/",
+    "social_url": "https://zhaopin.meituan.com/web/social",
+    "login_button_selector": "button.loginBtn",
+    "login_mode": "phone_sms",
+    "phone_input_selector": "input[placeholder*='手机号码']",
+    "sms_input_selector": "input[placeholder*='验证码']",
+    "job_item_selector": ".position_list_item",
+    "job_title_selector": ".postion_name .title",
+    "job_city_selector": ".split_line_box_item.city",
+    "job_id_attr": "data-jobunionid",
+    "job_detail_url_pattern": "https://zhaopin.meituan.com/web/position/detail?jobUnionId={id}",
+    "resume_input_selector": "input[type=file]",
+    "apply_selector": "button.mtd-button-large",
+    "receipt_marker": "投递成功|已提交|申请已收到",
+    "note": "岗位列表公开可读（114 社招）；详情页 zhaopin.meituan.com/web/position/detail?jobUnionId={id}；登录后「立即申请」= button.mtd-button-large；登录=手机号+短信验证码（验证码人工收）"
+  }
+}

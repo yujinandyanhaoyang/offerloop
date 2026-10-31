@@ -1,0 +1,16 @@
+# 数据与个人配置（不入库）
+data/
+config/投递数据.json
+config/执行策略.json
+config/当前检索范围.json
+config/resume.md
+config/resume.pdf
+config/photo.png
+config/connection.json
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+__pycache__/
+*.pyc
+node_modules/
+.DS_Store

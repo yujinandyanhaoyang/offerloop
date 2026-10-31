@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "name": "你的姓名",
+  "gender": "性别",
+  "birth": "YYYY-MM-DD",
+  "phone": "手机号",
+  "phone_policy": "follow_login",
+  "email": "邮箱",
+  "education": {"school": "学校", "major": "专业", "degree": "本科", "years": "2022-2026"},
+  "work_years": "工作年限",
+  "city": "期望城市",
+  "expected_cities": ["城市1", "城市2"],
+  "work_experience": [{"company": "公司", "title": "职位", "period": "2024.01-至今"}],
+  "resume_pdf": "resume.pdf",
+  "resume_photo": "photo.png",
+  "skip_fields": ["身份证号", "护照", "人脸识别", "生物识别"],
+  "notes": "填写真实信息；不要提交到公开仓库（已在 .gitignore）"
+}

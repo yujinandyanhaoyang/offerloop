@@ -1,0 +1,285 @@
+{
+  "_schema": "投递数据 → 平台表单 字段映射。程序读取后按 selector / fill_type / source_field 自动填表。选择器只收录真实 DOM 已核实的；未核实的留空或标注「待核实」，禁止编造。source_field 使用投递数据.json 的路径（点号分隔，如 education.degree）。",
+  "schema_version": 2,
+  "common": {
+    "semantic_types": [
+      "text",
+      "dropdown",
+      "date",
+      "city",
+      "file_upload",
+      "skip"
+    ],
+    "fields": {
+      "name": {
+        "type": "text"
+      },
+      "gender": {
+        "type": "dropdown"
+      },
+      "birth": {
+        "type": "date"
+      },
+      "phone": {
+        "type": "text",
+        "policy": "follow_login",
+        "note": "平台强制跟随登录号时不可改，按登录号处理"
+      },
+      "email": {
+        "type": "text"
+      },
+      "education.school": {
+        "type": "text"
+      },
+      "education.major": {
+        "type": "dropdown"
+      },
+      "education.degree": {
+        "type": "dropdown"
+      },
+      "education.years": {
+        "type": "text",
+        "note": "年份区间字符串（如 2022-2026），非单一日期"
+      },
+      "work_years": {
+        "type": "dropdown"
+      },
+      "city": {
+        "type": "city"
+      },
+      "expected_cities": {
+        "type": "city",
+        "multi": true
+      },
+      "work_experience": {
+        "type": "skip",
+        "note": "投递确认页无对应表单，随简历正文，不直接填表"
+      },
+      "resume_pdf": {
+        "type": "file_upload",
+        "accept": [
+          ".pdf",
+          ".doc",
+          ".docx"
+        ]
+      },
+      "resume_photo": {
+        "type": "file_upload",
+        "accept": [
+          ".jpg",
+          ".png",
+          ".jpeg"
+        ]
+      }
+    },
+    "sensitive_skip": {
+      "source_field": "skip_fields",
+      "values": [
+        "身份证号",
+        "护照",
+        "人脸识别",
+        "生物识别"
+      ],
+      "note": "身份证/护照/人脸/生物识别等敏感字段一律 skip，不采集不填写"
+    }
+  },
+  "meituan": {
+    "name": "美团",
+    "form_url": "https://zhaopin.meituan.com/web/delivery-confirm",
+    "mapping_status": "已实测核实（2026-10-30）：投递确认页全部必填字段选择器与填写方式已跑通 dry-run",
+    "fill_patterns": {
+      "dropdown_searchable": "点 .mtd-select 实例 → 在实例内 input 逐字 type 过滤 → 点 li 选项（getByText 会撞字段标签，改用 li/[role=option] 过滤）",
+      "date_picker": "点 input[placeholder] 开面板 → 点 .mtd-month-calendar-year-btn 开年份面板 → 点 .mtd-year-panel-list-data（内层 role=button，非外层 -list）选年 → 点 .mtd-month-panel-list-data 选月。年月格式无日级，选完即值（如 2004/07）",
+      "file_upload": "input.mtd-upload-input 靠 accept 区分简历(.pdf/.doc/.docx)与作品集(.jpg/.png/.jpeg)；用 browser_pw.js upload（Playwright filechooser），CDP DOM.setFileInputFiles 不生效"
+    },
+    "fields": {
+      "real_name": {
+        "selector": "input[placeholder*=\"真实姓名\"]",
+        "fill_type": "text",
+        "source_field": "name",
+        "note": "从当次投递数据读取，不能复用页面既有姓名或示例值"
+      },
+      "gender": {
+        "selector": ".mtd-select >> nth=0",
+        "fill_type": "dropdown",
+        "source_field": "gender",
+        "note": "nth 为 DOM 顺序索引，表单结构变化时需重核"
+      },
+      "phone": {
+        "selector": "input[placeholder*=\"手机号码\"]",
+        "fill_type": "follow_login",
+        "source_field": "phone",
+        "note": "disabled，随登录号，不可改；follow_login"
+      },
+      "email": {
+        "selector": "input[placeholder*=\"邮箱\"]",
+        "fill_type": "text",
+        "source_field": "email"
+      },
+      "birth": {
+        "selector": "input[placeholder=\"选择日期\"]",
+        "fill_type": "date",
+        "source_field": "birth",
+        "note": "年月格式（2004/07），无日级；走 fill_patterns.date_picker"
+      },
+      "city": {
+        "selector": ".mtd-select >> nth=2",
+        "fill_type": "dropdown",
+        "source_field": "city"
+      },
+      "work_years": {
+        "selector": "input[placeholder=\"请选择\"]",
+        "fill_type": "date",
+        "source_field": "work_years",
+        "note": "参加工作年份，值 2026；mtd-date-picker 年模式"
+      },
+      "highest_degree": {
+        "selector": ".mtd-select >> nth=3",
+        "fill_type": "dropdown",
+        "source_field": "education.degree"
+      },
+      "expected_city": {
+        "selector": ".mtd-select >> nth=4",
+        "fill_type": "dropdown",
+        "source_field": "expected_cities"
+      },
+      "school": {
+        "selector": ".mtd-select >> nth=5",
+        "fill_type": "dropdown",
+        "source_field": "education.school"
+      },
+      "major": {
+        "selector": ".mtd-select >> nth=6",
+        "fill_type": "dropdown",
+        "source_field": "education.major",
+        "note": "searchable，需 type 过滤后点选项"
+      },
+      "degree": {
+        "selector": ".mtd-select >> nth=7",
+        "fill_type": "dropdown",
+        "source_field": "education.degree"
+      },
+      "work_type": {
+        "selector": ".mtd-select >> nth=9,11,13",
+        "fill_type": "dropdown",
+        "source_field": "work_experience",
+        "note": "工作经历每段一个工作类型（正式/实习/兼职/外包）",
+        "blocked_reason": "多段工作经历需逐段映射；nth=9,11,13不是可执行的唯一选择器"
+      },
+      "resume_attachment": {
+        "selector": "input.mtd-upload-input",
+        "fill_type": "file_upload",
+        "source_field": "resume_pdf",
+        "accept": [
+          ".pdf",
+          ".doc",
+          ".docx"
+        ],
+        "note": "与作品集共用 input.mtd-upload-input，靠 accept 区分"
+      },
+      "portfolio": {
+        "selector": "input.mtd-upload-input",
+        "fill_type": "file_upload",
+        "source_field": "resume_photo",
+        "accept": [
+          ".jpg",
+          ".png",
+          ".jpeg"
+        ],
+        "note": "实际接受 rar/zip/7z/pdf；作品集暂以简历照片对应，语义待确认",
+        "blocked_reason": "作品集不能用简历照片替代；需真实作品集材料及页面文件类型核验"
+      },
+      "submit": {
+        "selector": "button.submit",
+        "fill_type": "submit",
+        "source_field": null,
+        "note": "「投递」按钮；无独立「保存」按钮，表单数据随填写保存在页面"
+      }
+    },
+    "sensitive_skip": [
+      "身份证号",
+      "护照",
+      "人脸识别",
+      "生物识别"
+    ]
+  },
+  "zhaopin": {
+    "name": "智联招聘",
+    "resume_url": "https://i.zhaopin.com/resume",
+    "form_mode": "online_resume",
+    "mapping_status": "结构已核实（2026-10-30）：在线简历分节编辑结构 + 各节编辑/添加按钮 + 基本信息弹窗字段已定位；逐字段选择器与填写实测留待后续（当前简历已填，避免改动真实在线简历）",
+    "note": "在线简历=分节编辑（非美团式一次性投递表单），每节有编辑/添加按钮，点开弹窗填字段后「保存并更新」；复用 browser_pw.js fill/select/upload 原语",
+    "sections": {
+      "basic_info": {
+        "edit_selector": ".profile-pre-edit",
+        "save": "保存并更新",
+        "note": "弹窗内标准 input；日期字段年月格式(YYYY-MM)，与美团一致",
+        "field_selectors": {
+          "name": {
+            "selector": "input[placeholder*=\"真实姓名\"]",
+            "fill_type": "text",
+            "source_field": "name"
+          },
+          "birth": {
+            "selector": "input[placeholder*=\"生日\"]",
+            "fill_type": "date",
+            "source_field": "birth",
+            "note": "readonly 日期选择器，年月格式"
+          },
+          "work_years": {
+            "selector": "input[placeholder*=\"参加工作\"]",
+            "fill_type": "date",
+            "source_field": "work_years",
+            "note": "参加工作时间，年月格式"
+          }
+        }
+      },
+      "job_intention": {
+        "edit_selector": ".wanna-edit",
+        "add_selector": ".wanna-edit__add",
+        "position_cascader": {
+          "component": "s-cascader",
+          "search_selector": "input[placeholder*=\"搜索职位类别\"]",
+          "hierarchy": [
+            "互联网/通信及硬件",
+            "人工智能",
+            "人工智能/算法"
+          ],
+          "target": "人工智能/算法",
+          "note": "期望职位为 s-cascader 级联（类目→子类→职位）；选项对 Playwright 判「不可见」、JS click 不触发 Vue 选中提交。2026-10-31 复核：在线简历期望职位已是「算法工程师」（软件/IT服务、人工智能），即旧目标「人工智能/算法」，原记录「Java」过时；s-cascader 自动化改值仍不响应（3 轮 25 种保留记录），后续程序化改值走 browser_cdp.js netcapture API 抓包（需用户手动改一次触发）。类目语义（方向线 Agent 应用研发 vs 智联算法工程师叶子）用户 2026-10-31 明确忽略，保持旧目标。"
+        },
+        "note": "期望职位/城市/薪资/行业；当前 1 条=算法工程师（人工智能/算法），已符合旧目标（原记录 Java 过时，2026-10-31 复核）。"
+      },
+      "work_experience": {
+        "add_selector": ".job-exp-add",
+        "edit_selector": ".job-exp-pre-item-edit"
+      },
+      "education": {
+        "add_selector": ".edu-experience-add-right",
+        "edit_selector": ".zp-edit-icon"
+      },
+      "project": {
+        "add_selector": ".project-exp-add",
+        "edit_selector": ".project-exp-pre-item-edit"
+      },
+      "attachment": {
+        "add_selector": ".picture-enclosure__add-btn",
+        "note": "简历附件 PDF 上传（作品/附件区）"
+      },
+      "job_status": {
+        "edit_selector": ".job-status__edit"
+      },
+      "advantage": {
+        "edit_selector": ".zp-evalution-edit-text"
+      }
+    }
+  },
+  "boss": {
+    "name": "BOSS直聘",
+    "note": "反爬阻塞（2026-10-30）：/web/geek/resume 在线简历页 Runtime.evaluate 超时且标签页自行关闭，与 /job_detail/ 反爬一致；简历结构/选择器无法核实"
+  },
+  "nowcoder": {
+    "name": "牛客",
+    "note": "待补：表单字段映射未核实"
+  }
+}
