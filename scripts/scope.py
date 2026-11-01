@@ -3,7 +3,7 @@ import hashlib
 import json
 from datetime import date
 from pathlib import Path
-from config import SCOPE as CAMPAIGN
+from config import SCOPE as CAMPAIGN, PROJECT_ROOT
 
 
 def read_campaign(path=CAMPAIGN):
@@ -82,7 +82,7 @@ def search_plan(cell, today):
                             '细分领先证据及比较范围', '赚钱能力与现金／回款依据',
                             '公司C1-C5与岗位J1-J5', '本阶段关键缺口与面试核验项',
                             '筛选规则版本', '结论及下一行动'],
-        'screening_rules_path': str(PROJECT / 'AI时代公司与岗位过滤器.md'),
+        'screening_rules_path': str(PROJECT_ROOT / '规则' / 'AI时代公司与岗位过滤器.md'),
         'evidence_policy': '按初筛、争取名单、面试与offer分阶段核验；有效招聘必要，急招用于排序；查询命中不代表业务或岗位通过。',
         'note': '仅生成检索任务；需使用当前受支持公开工具取得证据，不代表已联网或在招。'
     }

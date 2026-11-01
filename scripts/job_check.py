@@ -18,12 +18,16 @@ J_CHECKS = {
 }
 
 JUDGMENTS = {"", "待核", "已满足", "可补", "待招聘方确认", "明确不符"}
+# 岗位是否在招、可投递：筛岗第一关，先于公司背调与岗位匹配
+JD_STATUS = {"在招可投", "在招待核", "已关闭", "未知"}
 
 
 def init_card(job):
     return {
         "job": job,
         "checked_on": date.today().isoformat(),
+        "jd_status": "",
+        "jd_source": "",
         "checks": {jid: {"name": name, "judgment": "", "evidence": "", "jd_quote": "", "gap": ""}
                    for jid, name in J_CHECKS.items()},
         "overall_decision": "",
@@ -49,6 +53,15 @@ def validate_card(card):
         errors.append("overall_decision 必须是 shortlist/clarify/exclude")
     if not card.get("next_action"):
         errors.append("缺 next_action")
+    # 在招/可投递：先于公司背调与岗位匹配；shortlist 必须有在招可投的原帖
+    jd_status = card.get("jd_status")
+    if jd_status and jd_status not in JD_STATUS:
+        errors.append("jd_status 非法（在招可投/在招待核/已关闭/未知）")
+    if card.get("overall_decision") == "shortlist":
+        if jd_status != "在招可投":
+            errors.append("shortlist 须 jd_status=在招可投（先核原帖在招且可投）")
+        if not card.get("jd_source"):
+            errors.append("shortlist 须 jd_source（原帖/平台与最近更新时间）")
     return errors
 
 

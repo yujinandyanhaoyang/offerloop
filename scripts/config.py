@@ -45,6 +45,9 @@ HOME = _resolve('home', 'OFFERLOOP_HOME', REPO / 'data')
 CONFIG = _resolve('config', 'OFFERLOOP_CONFIG', REPO / 'config')
 ADAPTERS = _resolve('adapters', 'OFFERLOOP_ADAPTERS', CONFIG)
 
+# 项目实例根：offerloop.local.json 所在目录（无本地配置时退回 harness 目录）
+PROJECT_ROOT = _base
+
 # 数据（运行时/个人，不入库）
 LEDGER = HOME / 'ledger.sqlite3'
 CHAIN_DIR = HOME / 'chain'

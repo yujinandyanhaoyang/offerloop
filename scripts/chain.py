@@ -10,6 +10,7 @@
     python -X utf8 scripts/chain.py ready    [--scope ready|shortlist|all]
     python -X utf8 scripts/chain.py apply    [--execute]   # 仅外包岗，默认 dry-run
     python -X utf8 scripts/chain.py run      # 串起来，全 dry-run
+    python -X utf8 scripts/chain.py status   # 一眼现状：台账 + ready 短名单 + 环境就绪
 
 边界（来自 harness.json boundary）：真实投递仅外包岗（外包/派遣/OD 岗）；正编与「在考虑范围」岗只登记不真投。
 本脚本默认全部 dry-run，不真实投递、不真实打招呼。空参 / --help 打印本用法。
@@ -18,6 +19,7 @@ import argparse
 import json
 import subprocess
 import sys
+from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -358,6 +360,45 @@ def cmd_run(a):
     return cmd_apply(a)
 
 
+def cmd_status(a):
+    """一眼现状：台账 summary + ready 短名单 + 环境就绪（全部只读）。"""
+    db = getattr(a, 'db', None) or DEFAULT_DB
+    ledger = Ledger(db)
+    try:
+        jobs = ledger.db.execute('SELECT id, decision FROM jobs ORDER BY id').fetchall()
+        counts = Counter(r['decision'] for r in jobs)
+        has_apps = ledger.db.execute("SELECT 1 FROM sqlite_master WHERE name='applications'").fetchone()
+        apps = {r['job_id']: dict(r) for r in ledger.db.execute('SELECT * FROM applications')} if has_apps else {}
+        ready_cnt = sum(1 for x in apps.values() if x['stage'] == 'ready')
+        submitted = 0
+        if ledger.db.execute("SELECT 1 FROM sqlite_master WHERE name='events'").fetchone():
+            for r in ledger.db.execute("SELECT data FROM events WHERE kind='application_event'"):
+                try:
+                    if json.loads(r['data']).get('stage') == 'submitted':
+                        submitted += 1
+                except ValueError:
+                    pass
+        shortlist = []
+        for r in ledger.db.execute("SELECT * FROM jobs WHERE decision='shortlist' ORDER BY id"):
+            p = json.loads(r['payload'])
+            app = apps.get(r['id'])
+            shortlist.append({'job_id': r['id'], 'company': p.get('company', ''),
+                              'title': p.get('title', ''), 'city': p.get('city', ''),
+                              'stage': app['stage'] if app else '未备材料'})
+        summary = {'ledger': {'jobs_total': len(jobs), 'decisions': dict(counts),
+                              'ready_materials': ready_cnt, 'submitted_receipts': submitted},
+                   'ready_shortlist': shortlist}
+        try:
+            from env_health import probe
+            summary['environment'] = probe(db)
+        except Exception as exc:  # noqa: BLE001 — 环境探测失败不影响台账输出
+            summary['environment'] = {'error': str(exc)}
+        print(json.dumps(summary, ensure_ascii=False, indent=2))
+    finally:
+        ledger.close()
+    return 0
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog='chain.py', description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -417,6 +458,9 @@ def main(argv=None):
     p.add_argument('--output', default=None)
     p.add_argument('--db', type=Path, default=None)
 
+    p = sub.add_parser('status', help='一眼现状：台账 summary + ready 短名单 + 环境就绪（只读）')
+    p.add_argument('--db', type=Path, default=None)
+
     a = ap.parse_args(argv)
     if not a.cmd:
         ap.print_help()
@@ -424,7 +468,7 @@ def main(argv=None):
     dispatch = {'discover': cmd_discover, 'import': cmd_import, 'screen': cmd_screen,
                 'ready': cmd_ready, 'apply': cmd_apply, 'run': cmd_run,
                 'submit': cmd_submit, 'followup': cmd_followup, 'check': cmd_check,
-                'shortlist': cmd_shortlist, 'prepare': cmd_prepare}
+                'shortlist': cmd_shortlist, 'prepare': cmd_prepare, 'status': cmd_status}
     return dispatch[a.cmd](a)
 
 

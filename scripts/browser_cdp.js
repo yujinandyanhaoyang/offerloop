@@ -273,6 +273,30 @@ async function jobs(p) {
   const companySel = p.company_selector;
   const base = p.base_url;
   const out = await evalOn(page, `(function(){
+    // 1) SSR 状态优先：智联等平台把岗位列表放在 window.__INITIAL_STATE__.positionList
+    try {
+      var st = window.__INITIAL_STATE__ || {};
+      var list = st.positionList || (st.searchResult && st.searchResult.positionList) || [];
+      if (list && list.length) {
+        return JSON.stringify(list.map(function(x){
+          return {
+            title: x.name || x.jobName || '',
+            company: x.companyName || '',
+            city: x.workCity || x.cityDistrict || '',
+            salary: x.salary60 || '',
+            years: x.workingExp || '',
+            education: x.education || '',
+            source_url: x.positionURL || '',
+            job_id: x.jobId || x.number || '',
+            source_level: 'partial',
+            observed_on: new Date().toISOString().slice(0,10),
+            summary: (x.jobDescription || '').slice(0,160),
+            next_action: '打开详情页核验原JD与准入'
+          };
+        }));
+      }
+    } catch (e) {}
+    // 2) DOM 兜底
     var names = Array.from(document.querySelectorAll(${JSON.stringify(anchor)}));
     var items = names.map(function(a){
       var card = a.closest(${JSON.stringify(p.card_selector)}) || a.closest('[class*=card]') || a.closest('li') || a.parentElement;

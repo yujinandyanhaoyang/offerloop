@@ -12,7 +12,7 @@
     "anchor_is_company": false,
     "title_selector": "a.job-name",
     "company_selector": ".boss-info",
-    "submit_selector": ".op-btn-chat",
+    "submit_selector": "a.btn.btn-startchat",
     "submit_kind": "chat",
     "chat_url": "https://www.zhipin.com/web/geek/chat",
     "allowed_hosts": [
@@ -22,14 +22,14 @@
   "zhaopin": {
     "name": "智联招聘",
     "base_url": "https://www.zhaopin.com",
-    "search_url": "https://sou.zhaopin.com/?jl={city}&kw={kw}",
+    "search_url": "https://www.zhaopin.com/jobs/?jl={city}&kw={kw}",
     "city_code": {
       "杭州": "653",
       "深圳": "765"
     },
-    "card_anchor": "a.job-card__company-name",
+    "card_anchor": ".job-card__title-main",
     "card_selector": ".job-card",
-    "anchor_is_company": true,
+    "anchor_is_company": false,
     "title_selector": "span.job-detail-summary__title-text",
     "company_selector": "a.job-card__company-name",
     "submit_selector": "button.a-button.a--bordered.a--filled",

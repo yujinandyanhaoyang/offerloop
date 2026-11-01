@@ -293,7 +293,7 @@ def main():
         if args.output:save(args.output,result)
         emit(result);return
     config=read(CONFIG)
-    if read(PROJECT/'project-memory.json')['project_id']!=config['project_id']:
+    if read(PROJECT/'memory'/'project-memory.json')['project_id']!=config['project_id']:
         raise ValueError('不是目标求职项目')
     if args.command=='plan':
         end=date.fromisoformat(args.until) if args.until else datetime.now(ZoneInfo('Asia/Shanghai')).date()

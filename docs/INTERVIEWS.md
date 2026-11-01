@@ -1,6 +1,6 @@
 # 面经研究工具
 
-面向 OfferLoop 的现有Harness增量。规范只维护在项目[职业适配工作流](../../职业适配工作流.md)；本页维护工具契约。配置与当前数据入口见[interview-harness.json](../../interview-harness.json)，Skill在[career-interviews](../../.agents/skills/career-interviews/SKILL.md)。Python标准库，无新增服务、认证或依赖。
+面向 OfferLoop 的现有Harness增量。规范只维护在个人项目「规则\职业适配工作流.md」；本页维护工具契约。配置与当前数据入口见个人项目根目录 interview-harness.json，Skill 在个人项目 .agents/skills/career-interviews/。Python标准库，无新增服务、认证或依赖。
 
 ## 工具分工
 
