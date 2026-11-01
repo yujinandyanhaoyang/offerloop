@@ -238,7 +238,7 @@ Chrome对照增量：本人完成扩展安装，已实际连接Chrome用户1；�
 
 登记进展时使用同一条命令完成本地提交、HTML刷新和飞书读回：`assistant.py --sync-progress import/finish/report ...`，或`pipeline.py --sync-progress complete/prepare/record/defer/track ...`。全局选项放子命令前。Agent后续登记业务进展默认采用此入口；不带选项仍只执行本地操作，不改变既有程序调用契约。仅支持正式台账，其他`--db`在执行前拒绝，避免测试数据进入真实看板。
 
-返回`progress_sync.local_committed=true`表示本地操作已保存；若`feishu_verified=false`，不能重放原登记命令，只排查并重试同步。原SQLite就是待同步的事实来源，无需人工补录云端。`python -X utf8 scripts/feishu_base.py --sync`只读预览差异；加`--apply`执行并读回验证。无差异不写入，按业务键查重，不删除记录，不从云端反向改写本地；未知写入先回查，不重放。连接与逐次回执位于项目`.local/offerloop/飞书进展/`。尚未配置定时触发，不宣称后台自动收信或更新。测试使用`python -X utf8 -m unittest discover -s scripts/offerloop -p 'test_*.py'`。
+返回`progress_sync.local_committed=true`表示本地操作已保存；若`feishu_verified=false`，不能重放原登记命令，只排查并重试同步。原SQLite就是待同步的事实来源，无需人工补录云端。`python -X utf8 scripts/feishu_base.py --sync`只读预览差异；加`--apply`执行并读回验证。无差异不写入，按业务键查重，不删除记录，不从云端反向改写本地；未知写入先回查，不重放。连接与逐次回执位于项目`.local/offerloop/feishu/`（`connection.json` 及 `runs/`）；2026-11-01 起已配置每周五 20:00 的自动同步任务（先 `assistant.py report` + `overview.py` 刷新本地，再 `feishu_base.py --sync --apply` 并读回 `verified` 与台账行数）。飞书 user 授权过期时同步会失败，需会话内 `lark-cli auth login --scope "bitable:app" --no-wait --json` 重新授权；不宣称授权失效后仍能后台自动同步。测试使用`python -X utf8 -m unittest discover -s tests -p 'test_*.py'`。
 
 本轮Chrome扩展智联创建与读取均超时，库存仅证实首页标签存在。不得把创建成功或标题可见记作登录/平台功能验收。与内嵌路由故障、Windows原生URL安全阻断分开记录，根因尚未确认；环境没有实质变化不重复打开、刷新或关闭用户页面。
 
