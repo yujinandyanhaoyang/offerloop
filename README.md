@@ -54,6 +54,8 @@ BOSS直聘 / 智联招聘 / 企业官网
 
 所以同一套框架，上层可以是 DSH 智能体，也可以是你手敲命令，行为完全一致。
 
+![示例台账（演示数据）](docs/images/demo-ledger.png)
+
 ## 快速开始
 
 ### 1. 前置条件
@@ -172,3 +174,4 @@ offerloop/
 MIT，见 [LICENSE](LICENSE)。
 
 Copyright (c) 2026 OfferLoop contributors。可自由使用、修改、分发（含商业用途），前提是保留版权与许可声明。
+
