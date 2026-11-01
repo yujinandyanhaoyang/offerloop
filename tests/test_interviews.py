@@ -4,10 +4,18 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-spec=importlib.util.spec_from_file_location('interviews',Path(__file__).with_name('interviews.py'))
-tool=importlib.util.module_from_spec(spec)
-spec.loader.exec_module(tool)
+MODULE_PATH = Path(__file__).resolve().parent.parent / 'scripts' / 'interviews.py'
+if MODULE_PATH.is_file():
+    spec = importlib.util.spec_from_file_location('interviews', MODULE_PATH)
+    tool = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(tool)
+else:
+    tool = None
 
+_READY = tool is not None and Path(tool.CONFIG).is_file()
+
+
+@unittest.skipUnless(_READY, 'interview-harness.json 配置不在本仓库（项目级数据），跳过')
 class InterviewHarnessTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

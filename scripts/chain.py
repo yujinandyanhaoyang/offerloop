@@ -147,7 +147,7 @@ def cmd_apply(a):
         print('\n== 外包岗（可 dry-run 投递测试；真实投递需另行授权并核对回执）==')
         for jid, payload, ctx in outsourcing:
             platform = (ctx.get('platform') or '').strip()
-            platform_key = platform if platform in ('boss', 'zhaopin', 'meituan') else ''
+            platform_key = platform if platform in ('boss', 'zhaopin', 'example') else ''
             print('%s｜%s｜%s｜平台=%s' % (jid, payload.get('company'), payload.get('title'),
                                          platform_key or '待登记'))
             if not platform_key:
@@ -184,7 +184,7 @@ def cmd_submit(a):
             return 0
         for jid, payload, ctx, app in outsourcing:
             platform = (ctx.get('platform') or '').strip()
-            platform_key = platform if platform in ('boss', 'zhaopin', 'meituan') else ''
+            platform_key = platform if platform in ('boss', 'zhaopin', 'example') else ''
             print('%s｜%s｜%s｜平台=%s' % (jid, payload.get('company'), payload.get('title'), platform_key or '待登记'))
             if not platform_key:
                 print('  → 平台未登记，跳过（先 pipeline.py track 登记 platform）')

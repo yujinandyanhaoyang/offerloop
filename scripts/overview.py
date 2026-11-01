@@ -25,8 +25,8 @@ HARNESS_JSON = ADAPTERS / 'harness.json'
 OUT = ROOT / '总览.html'
 
 DECISIONS = {'pending': '待核验', 'clarify': '待澄清', 'exclude': '已排除', 'shortlist': '初筛候选'}
-PLATFORM_LABEL = {'boss': 'BOSS', 'zhaopin': '智联', 'meituan': '美团'}
-PLATFORM_ORDER = ['boss', 'zhaopin', 'meituan']
+PLATFORM_LABEL = {'boss': 'BOSS', 'zhaopin': '智联', 'example': '示例官网'}
+PLATFORM_ORDER = ['boss', 'zhaopin', 'example']
 CAP_LABEL = {'greet': '打招呼', 'apply': '投递', 'update_resume': '更新简历'}
 DETAIL_ORDER = ['shortlist', 'clarify', 'exclude', 'pending']
 STAGE_LABEL = {'ready': '材料就绪', 'submitted': '已投递', 'submission_unknown': '提交待核',

@@ -7,8 +7,9 @@ import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
 
-from config import HOME as BASE, RESUME
-CONFIG = Path(__file__).parent / 'platforms/zhaopin.json'
+from config import HOME as BASE, RESUME, ADAPTERS, CONFIG as CONFIG_DIR
+CONFIG = ADAPTERS / '简历字段标签.json'
+FACTS = CONFIG_DIR / '投递数据.json'
 TRUSTED = {'user_confirmed', 'existing_resume_fact', 'platform_existing_readback'}
 FACT_FIELDS = {
     'name': ['name'], 'gender': ['gender'], 'identity': ['identity'],

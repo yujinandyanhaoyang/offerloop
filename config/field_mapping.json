@@ -83,13 +83,13 @@
       "note": "身份证/护照/人脸/生物识别等敏感字段一律 skip，不采集不填写"
     }
   },
-  "meituan": {
-    "name": "美团",
-    "form_url": "https://zhaopin.meituan.com/web/delivery-confirm",
+  "example": {
+    "name": "示例企业官网（占位，替换成你目标公司的官网）",
+    "form_url": "https://example.com/careers/delivery-confirm",
     "mapping_status": "已实测核实（2026-10-30）：投递确认页全部必填字段选择器与填写方式已跑通 dry-run",
     "fill_patterns": {
       "dropdown_searchable": "点 .mtd-select 实例 → 在实例内 input 逐字 type 过滤 → 点 li 选项（getByText 会撞字段标签，改用 li/[role=option] 过滤）",
-      "date_picker": "点 input[placeholder] 开面板 → 点 .mtd-month-calendar-year-btn 开年份面板 → 点 .mtd-year-panel-list-data（内层 role=button，非外层 -list）选年 → 点 .mtd-month-panel-list-data 选月。年月格式无日级，选完即值（如 2004/07）",
+      "date_picker": "点 input[placeholder] 开面板 → 点 .mtd-month-calendar-year-btn 开年份面板 → 点 .mtd-year-panel-list-data（内层 role=button，非外层 -list）选年 → 点 .mtd-month-panel-list-data 选月。年月格式无日级，选完即值（如 YYYY/MM）",
       "file_upload": "input.mtd-upload-input 靠 accept 区分简历(.pdf/.doc/.docx)与作品集(.jpg/.png/.jpeg)；用 browser_pw.js upload（Playwright filechooser），CDP DOM.setFileInputFiles 不生效"
     },
     "fields": {
@@ -120,7 +120,7 @@
         "selector": "input[placeholder=\"选择日期\"]",
         "fill_type": "date",
         "source_field": "birth",
-        "note": "年月格式（2004/07），无日级；走 fill_patterns.date_picker"
+        "note": "年月格式（YYYY/MM），无日级；走 fill_patterns.date_picker"
       },
       "city": {
         "selector": ".mtd-select >> nth=2",
@@ -131,7 +131,7 @@
         "selector": "input[placeholder=\"请选择\"]",
         "fill_type": "date",
         "source_field": "work_years",
-        "note": "参加工作年份，值 2026；mtd-date-picker 年模式"
+        "note": "参加工作年份，年模式（mtd-date-picker）"
       },
       "highest_degree": {
         "selector": ".mtd-select >> nth=3",
@@ -207,13 +207,13 @@
     "name": "智联招聘",
     "resume_url": "https://i.zhaopin.com/resume",
     "form_mode": "online_resume",
-    "mapping_status": "结构已核实（2026-10-30）：在线简历分节编辑结构 + 各节编辑/添加按钮 + 基本信息弹窗字段已定位；逐字段选择器与填写实测留待后续（当前简历已填，避免改动真实在线简历）",
-    "note": "在线简历=分节编辑（非美团式一次性投递表单），每节有编辑/添加按钮，点开弹窗填字段后「保存并更新」；复用 browser_pw.js fill/select/upload 原语",
+    "mapping_status": "结构已核实（2026-10-30）：在线简历分节编辑结构 + 各节编辑/添加按钮 + 基本信息弹窗字段已定位；逐字段选择器与填写实测留待后续",
+    "note": "在线简历=分节编辑（非一次性投递表单），每节有编辑/添加按钮，点开弹窗填字段后「保存并更新」；复用 browser_pw.js fill/select/upload 原语",
     "sections": {
       "basic_info": {
         "edit_selector": ".profile-pre-edit",
         "save": "保存并更新",
-        "note": "弹窗内标准 input；日期字段年月格式(YYYY-MM)，与美团一致",
+        "note": "弹窗内标准 input；日期字段年月格式(YYYY-MM)",
         "field_selectors": {
           "name": {
             "selector": "input[placeholder*=\"真实姓名\"]",
@@ -241,14 +241,14 @@
           "component": "s-cascader",
           "search_selector": "input[placeholder*=\"搜索职位类别\"]",
           "hierarchy": [
-            "互联网/通信及硬件",
-            "人工智能",
-            "人工智能/算法"
+            "类目示例A",
+            "子类示例B",
+            "叶子示例C"
           ],
-          "target": "人工智能/算法",
-          "note": "期望职位为 s-cascader 级联（类目→子类→职位）；选项对 Playwright 判「不可见」、JS click 不触发 Vue 选中提交。2026-10-31 复核：在线简历期望职位已是「算法工程师」（软件/IT服务、人工智能），即旧目标「人工智能/算法」，原记录「Java」过时；s-cascader 自动化改值仍不响应（3 轮 25 种保留记录），后续程序化改值走 browser_cdp.js netcapture API 抓包（需用户手动改一次触发）。类目语义（方向线 Agent 应用研发 vs 智联算法工程师叶子）用户 2026-10-31 明确忽略，保持旧目标。"
+          "target": "叶子示例C",
+          "note": "期望职位为 s-cascader 级联（类目→子类→职位）；选项对 Playwright 判「不可见」、JS click 不触发 Vue 选中提交；程序化改值可走 browser_cdp.js netcapture API 抓包（需先人工手动改一次触发）。hierarchy/target 为占位示例，按你自己的目标职位替换。"
         },
-        "note": "期望职位/城市/薪资/行业；当前 1 条=算法工程师（人工智能/算法），已符合旧目标（原记录 Java 过时，2026-10-31 复核）。"
+        "note": "期望职位/城市/薪资/行业，逐条维护。"
       },
       "work_experience": {
         "add_selector": ".job-exp-add",

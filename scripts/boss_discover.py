@@ -39,7 +39,7 @@ def main():
         ledger = Ledger(args.db)
         start = max_app_id(ledger) + 1
     else:
-        start = args.start_id or 27
+        start = args.start_id or 1
 
     for it in items:
         if not it.get('title') or not it.get('source_url'):

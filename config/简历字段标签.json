@@ -1,0 +1,50 @@
+{
+  "_schema": "profile.py prepare/compare 用的平台简历字段标签与模块映射（智联在线简历）。labels 键必须覆盖 profile.py 的 ALLOWED 字段集合（26 项）；给新平台建映射时先读 profile.py 的 FACT_FIELDS/TEXT_FIELDS，再核真实页面模块。",
+  "platform": "智联招聘",
+  "edit_url": "https://i.zhaopin.com/resume",
+  "labels": {
+    "name": "姓名",
+    "gender": "性别",
+    "identity": "身份",
+    "current_city": "所在城市",
+    "monthly_salary_cny": "当前月薪(元)",
+    "education.school": "毕业院校",
+    "education.degree": "学历",
+    "education.major": "专业",
+    "education.start": "入学时间",
+    "education.end": "毕业时间",
+    "current_employment.company": "当前公司",
+    "current_employment.position": "当前职位",
+    "current_employment.start": "入职时间",
+    "current_employment.end": "离职时间",
+    "current_employment.monthly_salary_cny": "当前月薪(元)",
+    "prior_employment.company": "前公司",
+    "prior_employment.position": "前职位",
+    "prior_employment.start": "前段入职时间",
+    "prior_employment.end": "前段离职时间",
+    "prior_employment.monthly_salary_cny": "前段月薪(元)",
+    "graduation_project_period.start": "毕业设计开始",
+    "graduation_project_period.end": "毕业设计结束",
+    "current_work_body": "当前工作经历正文",
+    "prior_work_body": "前段工作经历正文",
+    "project_body": "项目经历正文",
+    "skills_body": "专业技能正文"
+  },
+  "modules": [
+    "basic_info",
+    "job_intention",
+    "work_experience",
+    "education",
+    "project",
+    "attachment",
+    "job_status",
+    "advantage"
+  ],
+  "unmapped": [
+    "phone",
+    "email",
+    "resume_pdf",
+    "resume_photo"
+  ],
+  "unmapped_note": "平台字段中不由 profile 计划映射的项：联系方式随登录账号处理，简历/照片附件走上传流程单独核验；保持非空表示映射未完全封闭，completed 判定会 fail-closed。"
+}

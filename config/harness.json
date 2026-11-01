@@ -19,10 +19,10 @@
           "selector": "button.summary-planes__prechat",
           "note": "打招呼/沟通按钮文本为「先聊聊」。独立详情页(jobdetail/{id}.htm) class=summary-planes__prechat；搜索页内联详情面板同按钮 class=job-detail-summary__prechat。text 兜底「先聊聊」。「立即投递」为 apply 动作，不属 greet。"
         },
-        "meituan": {
+        "example": {
           "status": "选择器已定位",
           "selector": "button.mtd-button-primary",
-          "note": "美团招聘无独立「立即沟通/打招呼」入口，唯一动作按钮「立即申请」= button.mtd-button-primary，实为投递/apply 动作（非打招呼），greet 能力在美团不适用；如需投递走 apply 能力。"
+          "note": "示例企业官网无独立「立即沟通/打招呼」入口，唯一动作按钮「立即申请」= button.mtd-button-primary，实为投递/apply 动作（非打招呼），greet 能力不适用；如需投递走 apply 能力。"
         }
       }
     },
@@ -32,24 +32,24 @@
       "platforms": {
         "boss": { "status": "选择器已配", "tool": "cdp", "cmd": "apply", "note": "platforms.json submit_selector=.op-btn-chat, submit_kind=chat（打招呼型）" },
         "zhaopin": { "status": "选择器已配", "tool": "cdp", "cmd": "apply", "note": "platforms.json submit_selector=button.a-button.a--bordered.a--filled（详情页「立即投递」）, submit_kind=apply" },
-        "meituan": { "status": "选择器已定位", "tool": "cdp", "cmd": "click", "arg": "投递", "note": "button.submit（投递确认页）" }
+        "example": { "status": "选择器已定位", "tool": "cdp", "cmd": "click", "arg": "投递", "note": "button.submit（投递确认页）" }
       }
     },
     "update_resume": {
       "description": "填/改在线简历，数据来自 投递数据.json（定义一次）",
       "params": ["platform"],
       "platforms": {
-        "meituan": {
+        "example": {
           "status": "已实测",
           "driver": "pw",
-          "mapping": "field_mapping.json#meituan",
+          "mapping": "field_mapping.json#example",
           "note": "browser_pw.js upload/fill/select + 日期选择器 -panel-list-data（年月格式）"
         },
         "zhaopin": {
           "status": "结构已核实，字段级待实测",
           "driver": "pw",
           "mapping": "field_mapping.json#zhaopin",
-          "note": "在线简历 i.zhaopin.com/resume 分节编辑；求职意向曾为 s-cascader 级联改值阻塞，2026-10-31 复核当前已是「算法工程师」（旧目标达成）；程序化改值走 browser_cdp.js netcapture API 抓包"
+          "note": "在线简历 i.zhaopin.com/resume 分节编辑；求职意向 s-cascader 级联改值阻塞，程序化改值走 browser_cdp.js netcapture API 抓包（需先人工手动改一次触发）"
         },
         "boss": { "status": "反爬阻塞", "note": "在线简历页 Runtime.evaluate 超时 + 标签页自行关闭" }
       }

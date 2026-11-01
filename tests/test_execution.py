@@ -1,7 +1,7 @@
 import tempfile
 import unittest
 from pathlib import Path
-from execution import prepare, registry, read, ROOT
+from execution import prepare, registry, read, ROOT, ADAPTERS
 
 
 class ExecutionTests(unittest.TestCase):
@@ -27,14 +27,14 @@ class ExecutionTests(unittest.TestCase):
         self.assertTrue(all('value' not in s for s in steps))
 
     def test_unverified_portfolio_and_repeated_work_mapping_blocked(self):
-        mapping = read(ROOT / 'field_mapping.json')['meituan']
-        steps = {s['field']: s for s in prepare('meituan', {}, mapping, Path('.'))['steps']}
+        mapping = read(ADAPTERS / 'field_mapping.json')['example']
+        steps = {s['field']: s for s in prepare('example', {}, mapping, Path('.'))['steps']}
         self.assertEqual(steps['portfolio']['status'], 'blocked')
         self.assertEqual(steps['work_type']['status'], 'blocked')
 
     def test_routes_do_not_claim_logged_in(self):
         routes = registry()
-        self.assertEqual(set(routes), {'boss', 'zhaopin', 'nowcoder', 'meituan'})
+        self.assertEqual(set(routes), {'boss', 'zhaopin', 'nowcoder', 'example'})
         self.assertTrue(all(r['authentication'] == 'not_checked' for r in routes.values()))
 
 

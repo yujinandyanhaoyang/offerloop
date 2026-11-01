@@ -54,8 +54,10 @@ class FeishuProjectionTests(unittest.TestCase):
             p.l.ingest([scoped_record()]); p.l.close()
             data = root/'track.json'
             data.write_text(json.dumps({'next_action':'fixture followup','evidence':['fixture']}))
+            (root/'connection.json').write_text('{}')
             out = io.StringIO()
             with patch('feishu_base.DEFAULT_DB', db), patch('feishu_base.PROJECT', root), \
+                 patch('feishu_base.CONFIG', root/'connection.json'), \
                  patch('feishu_base.sync', side_effect=RuntimeError('remote timeout')) as remote, \
                  patch.object(sys,'argv',['pipeline.py','--db',str(db),'--sync-progress','track','APP-001',str(data)]), redirect_stdout(out):
                 self.assertEqual(pipeline.main(),0)

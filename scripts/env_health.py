@@ -24,7 +24,7 @@ from config import LEDGER as DEFAULT_DB, BROWSER_STATE, PLATFORM_STATE
 
 CDP = 'http://127.0.0.1:9222'
 TIMEOUT = 1.5
-TARGET_HOSTS = ('zhipin.com', 'zhaopin.com', 'meituan.com', 'nowcoder.com',
+TARGET_HOSTS = ('zhipin.com', 'zhaopin.com', 'nowcoder.com',
                 'liepin.com', 'mianshima.com', 'watchjobs.net')
 
 

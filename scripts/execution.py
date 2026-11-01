@@ -12,7 +12,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent
-from config import HOME as PROJECT
+from config import HOME as PROJECT, ADAPTERS, CONFIG
 
 
 def read(path):
@@ -20,9 +20,9 @@ def read(path):
 
 
 def registry():
-    platforms = read(ROOT / 'platforms.json')
-    companies = read(ROOT / 'companies.json')
-    mapping = read(ROOT / 'field_mapping.json')
+    platforms = read(ADAPTERS / 'platforms.json')
+    companies = read(ADAPTERS / 'companies.json')
+    mapping = read(ADAPTERS / 'field_mapping.json')
     result = {}
     for key, adapter in {**platforms, **{k: v for k, v in companies.items() if not k.startswith('_')}}.items():
         form = mapping.get(key, {})
@@ -101,7 +101,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command', choices=['routes', 'prepare'])
     parser.add_argument('--platform')
-    parser.add_argument('--data', type=Path, default=PROJECT / '投递线/投递数据.json')
+    parser.add_argument('--data', type=Path, default=CONFIG / '投递数据.json')
     parser.add_argument('--base-dir', type=Path, default=PROJECT, help='base for relative attachment paths; default: career project')
     parser.add_argument('--output', type=Path, help='new private JSON file; contains personal values; never overwrite')
     args = parser.parse_args()
@@ -113,7 +113,7 @@ def main():
     else:
         if not args.platform:
             parser.error('--platform required')
-        mapping = read(ROOT / 'field_mapping.json').get(args.platform, {})
+        mapping = read(ADAPTERS / 'field_mapping.json').get(args.platform, {})
         result = prepare(args.platform, read(args.data), mapping, args.base_dir.resolve())
         result['route'] = routes[args.platform]
     if args.output:
