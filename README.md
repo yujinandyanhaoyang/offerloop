@@ -4,7 +4,27 @@
 
 面向秋招 / 社招、手上有 DeepSeek Harness（或愿意自己敲命令）的人。把「每天刷招聘网站、一页页翻岗位、判断值不值得投」这些重复劳动交给它，你只做筛选判断和最后的决定。
 
-## 3 步跑起来
+## 最快：让 AI 一键启动（推荐）
+
+1. 下载并安装 **DeepSeek Canis（DeepSeek Harness 桌面版）**，登录你的账户。
+2. 新建一个会话，把下面这段提示词整段粘进去：
+
+> 你是我的求职执行助手。仓库：https://github.com/yujinandyanhaoyang/offerloop
+>
+> 请从零帮我跑起来，全程 dry-run（不真实投递、不自动打招呼）：
+> 1. 把仓库克隆到当前目录；
+> 2. 按 `docs/DSH-上手.md` 复制 3 个 `*.example.json` 为真实配置；
+> 3. 逐项问我并填好 `config/投递数据.json` 与 `config/当前检索范围.json`；`config/执行策略.json` 的 `external_actions_enabled` 保持 `false`；
+> 4. 跑 `python -X utf8 scripts/chain.py status` 给我现状，再跑 `python -X utf8 scripts/chain.py run` 做一次全链 dry-run；
+> 5. 需要浏览器时提示我启动 `scripts/browser_launch.cmd` 并自行登录平台，验证码 / 扫码由我来。
+>
+> 缺 Python 3.11+ / Node 22+ / Chrome 的话，先告诉我怎么装。
+
+3. AI 会自己 clone、问你个人信息、填配置、跑通 dry-run。**你只需要回答问题**，真实投递最后仍由你本人点。
+
+---
+
+## 手动 3 步（不想用 AI 时）
 
 > 前置：Python 3.11+、Node.js 22+、Google Chrome。脚本只用标准库，**不需要 `pip install`**；DeepSeek Harness（DSH）可选，想用智能体替你执行时才需要。
 

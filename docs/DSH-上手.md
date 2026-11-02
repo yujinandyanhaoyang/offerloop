@@ -2,6 +2,8 @@
 
 面向第一次接触 DeepSeek Harness（DSH）和 OfferLoop 的人：**按顺序做完，30 分钟内跑出你的第一份投递清单**，全程不真实投递、不真实打招呼。
 
+> 想让 AI 全程代劳？复制 README 的「AI 一键启动」提示词即可；下面是手动和细节查阅版。
+
 ## 30 秒版：你只需要做这 3 件事
 
 1. **装环境**：Python 3.11+、Node.js 22+、Google Chrome（脚本只用标准库，不用 `pip install`）。
