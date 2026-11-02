@@ -1,3 +1,4 @@
+import _bootstrap  # noqa: F401
 import unittest
 from datetime import datetime, timezone
 from browser_health import assess, parse_line, latch

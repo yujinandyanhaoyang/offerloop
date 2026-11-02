@@ -1,3 +1,4 @@
+import _bootstrap  # noqa: F401
 import copy
 import tempfile
 import unittest
