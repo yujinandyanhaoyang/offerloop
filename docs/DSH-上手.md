@@ -2,6 +2,16 @@
 
 面向第一次接触 DeepSeek Harness（DSH）和 OfferLoop 的人。读完并按顺序做完，你能在 30 分钟内完成一次完整的 dry-run：环境就绪、配置填好、链路跑通、看到一份属于你自己的投递清单 —— 全程不真实投递、不真实打招呼。
 
+一张图看完整闭环（按本文章节顺序）：
+
+```mermaid
+flowchart LR
+    A["环境<br/>Python 3.11+ · Node 22+ · Chrome"] --> B["clone 仓库"]
+    B --> C["复制 3 个配置模板<br/>填个人数据"]
+    C --> D["status / run<br/>首次 dry-run"]
+    D --> E["按检查清单<br/>再决定是否真实投递"]
+```
+
 > 所有命令都以**仓库根目录**为工作目录。Windows 下统一用 `python -X utf8`，避免中文路径/输出乱码。
 
 ## 0 适用对象与预期

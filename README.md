@@ -4,6 +4,41 @@
 
 它把「发现岗位 → 筛选 → 背调 → 投递 → 跟进」这一串本来靠手工重复的活，收敛成一组固定命令 + 一份配置。默认全部 dry-run：不真实投递、不真实打招呼，先把链路跑通、把岗位看明白，再由你本人决定最后一下。
 
+## 一张图看懂 OfferLoop
+
+```mermaid
+flowchart TB
+    subgraph human["① 人 / 智能体"]
+        U["你：登录 · 授权 · 最终决定"]
+        AG["DSH 智能体：按固定命令执行"]
+    end
+    subgraph core["② 固定命令层（唯一入口）"]
+        C["scripts/chain.py<br/>discover → import → screen → check → prepare → ready → submit → followup"]
+    end
+    subgraph adapt["③ 适配层"]
+        B["scripts/browser_cdp.js<br/>Node 22 内置 WebSocket，无 npm 依赖"]
+        CFG["config/*.json<br/>平台选择器 · 表单映射 · 话术"]
+    end
+    subgraph host["④ 宿主机浏览器"]
+        CH["Chrome --remote-debugging-port=9222<br/>专用 profile · 登录态持久"]
+    end
+    subgraph plat["⑤ 招聘平台"]
+        P1["BOSS直聘"]
+        P2["智联招聘"]
+        P3["牛客 / 企业官网"]
+    end
+    U --> C
+    AG --> C
+    C --> B
+    C -.-> CFG
+    B --> CH
+    CH --> P1
+    CH --> P2
+    CH --> P3
+```
+
+一句话：**命令固定、平台细节在配置里、浏览器在宿主机、默认 dry-run。**
+
 ## 特性
 
 - **DSH 智能体驱动**：命令是固定的，DSH 智能体（如 deepseek-flash）只需按 `chain.py <步骤>` 依次执行，不需要理解任何平台的 DOM 与交互细节。
@@ -29,6 +64,22 @@
 3. 需要填表时在 `config/field_mapping.json` 加字段映射；
 4. 企业官网直接往 `config/companies.json` 加一个 key；
 5. 用 dry-run 验证（`chain.py submit` 不带 `--execute` 时只定位、不点击）。
+
+## 一条命令走完一个招聘周期
+
+`chain.py` 把「发现 → 入库 → 筛选 → 校验 → 备材料 → 清单 → 投递 → 跟进」串成可单跑、可一键的闭环，默认全 dry-run：
+
+```mermaid
+flowchart LR
+    D["discover 发现"] --> I["import 入库"] --> S["screen 筛选"] --> K["check 校验"] --> P["prepare 备材料"] --> R["ready 清单"]
+    R --> SUB{"submit 投递"}
+    SUB -->|"默认 dry-run：只定位，不点击"| DRY["人工确认"]
+    SUB -->|"--execute + 外包岗 + 已授权"| REAL["真实投递 · 抓回执"]
+    DRY --> F["followup 跟进"]
+    REAL --> F
+```
+
+`status` 只读看现状；`run` 一次串起全链（全非破坏性）。每一步都能单跑，中间产物落在 `data/chain/`。
 
 ## 怎么跑起来（架构）
 
@@ -113,6 +164,21 @@ python -X utf8 scripts/chain.py run      # 串起 发现→入库→筛选→清
 | deepseek-v4-pro | 决策与审查 | 岗位取舍、背调结论、话术微调、跟进回复这类判断，交给更强的模型，并由你本人确认 |
 
 一句话：**flash 干活，pro 拿主意，人做决定。**
+
+```mermaid
+flowchart TB
+    subgraph AI["智能体可以代劳"]
+        A1["读页面 · 提取岗位"]
+        A2["写台账 · 出清单"]
+        A3["定位投递按钮"]
+    end
+    subgraph YOU["必须你本人做"]
+        Y1["登录 · 验证码 · 新协议"]
+        Y2["真实投递的授权"]
+        Y3["接受 offer · 离职 · 迁居"]
+    end
+    AI -->|"交付草稿 / 定位结果"| YOU
+```
 
 ## 目录
 
