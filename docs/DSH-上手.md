@@ -1,8 +1,16 @@
 # DSH 上手：从零跑通 OfferLoop
 
-面向第一次接触 DeepSeek Harness（DSH）和 OfferLoop 的人。读完并按顺序做完，你能在 30 分钟内完成一次完整的 dry-run：环境就绪、配置填好、链路跑通、看到一份属于你自己的投递清单 —— 全程不真实投递、不真实打招呼。
+面向第一次接触 DeepSeek Harness（DSH）和 OfferLoop 的人：**按顺序做完，30 分钟内跑出你的第一份投递清单**，全程不真实投递、不真实打招呼。
 
-一张图看完整闭环（按本文章节顺序）：
+## 30 秒版：你只需要做这 3 件事
+
+1. **装环境**：Python 3.11+、Node.js 22+、Google Chrome（脚本只用标准库，不用 `pip install`）。
+2. **拿仓库 + 填配置**：`git clone` 后把 3 个 `*.example.json` 复制成真实配置，填上姓名 / 学历 / 履历 / 期望城市。
+3. **跑一条命令**：`python -X utf8 scripts/chain.py status`（只看现状，不需要浏览器）；想跑全链再 `python -X utf8 scripts/chain.py run`（全 dry-run）。
+
+跑完你会拿到：本地台账 `data/ledger.sqlite3`、一份投递清单 `data/投递清单.md`，以及一份只填一次、多平台复用的个人配置。
+
+一张图看完整闭环（下面第 0–7 节按这个顺序展开）：
 
 ```mermaid
 flowchart LR
@@ -12,7 +20,7 @@ flowchart LR
     D --> E["按检查清单<br/>再决定是否真实投递"]
 ```
 
-> 所有命令都以**仓库根目录**为工作目录。Windows 下统一用 `python -X utf8`，避免中文路径/输出乱码。
+> 所有命令都以**仓库根目录**为工作目录。Windows 下统一用 `python -X utf8`，避免中文路径/输出乱码。**下面第 0–7 节是详细版，按需展开。**
 
 ## 0 适用对象与预期
 
