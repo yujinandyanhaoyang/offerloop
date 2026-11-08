@@ -29,7 +29,7 @@ import job_check
 from ready_list import build as build_ready
 
 SCRIPT = Path(__file__).resolve().parent
-from config import CHAIN_DIR, OUTSOURCING_MARKERS
+from config import CHAIN_DIR, OUTSOURCING_MARKERS, PROFILE
 DEFAULT_JOBS = CHAIN_DIR / 'jobs.json'
 DEFAULT_CARDS = CHAIN_DIR / '证据卡'
 
@@ -251,7 +251,7 @@ def cmd_followup(a):
             jid = a.draft
             job = ledger.db.execute('SELECT payload FROM jobs WHERE id=?', (jid,)).fetchone()
             payload = json.loads(job['payload']) if job else {}
-            name = json.loads((PROJECT / '投递线/投递数据.json').read_text(encoding='utf-8'))['name']
+            name = json.loads(PROFILE.read_text(encoding='utf-8'))['name']
             draft = ('您好，我是%s，已于近期投递贵司「%s」岗位。想了解下简历筛选进度；'
                      '如有需要我可以补充项目经历或安排沟通，谢谢！') % (name, payload.get('title', '该岗位'))
             print(json.dumps({'job_id': jid, 'draft': draft,

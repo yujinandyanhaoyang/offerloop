@@ -121,7 +121,7 @@ def report(ledger, output):
         communication += (e(latest[1].get('summary', '')) + '<br><small>事件登记：' + e(local_time(latest[0])) + '</small>') if latest else '暂无真实投递／招聘回复'
         action = e(next_action or '待补下一行动') + '<br><small>下次检查（北京时间）：' + e(local_time(due)) + '</small>'
         action += ''.join('<p class="warning">' + e(w) + '</p>' for w in warnings)
-        sources = link(payload['source_url'], '原始JD／来源') + '<br><small>读取：' + e(payload['observed_on']) + '</small>'
+        sources = link(payload['source_url'], '原始JD／来源') + '<br><small>读取：' + e(payload.get('observed_on') or '未记录') + '</small>'
         if context.get('application_url'):
             sources += '<br>' + link(context['application_url'], '拟投入口')
         search = ' '.join([jid, platform, payload['company'], payload['title'], context.get('contact', '')])

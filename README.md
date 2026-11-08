@@ -219,6 +219,20 @@ offerloop/
 └── data/           # 运行时数据（台账 / 回执 / 投递清单，gitignored）
 ```
 
+## 面试准备：真题回放训练
+
+拿到面试之后，用固定的回放模式练，而不是漫无目的地刷题。`skills/interview-drill/SKILL.md` 定义了流程，`scripts/interview_drill.py` 负责落数据：
+
+```powershell
+python -X utf8 scripts/interview_drill.py add --json q.json   # 记一道题（原话 + 参考口述）
+python -X utf8 scripts/interview_drill.py batches             # 每 5 题归一批
+python -X utf8 scripts/interview_drill.py status              # 看待同步 / 缺口状态
+```
+
+要点：**AI 只出题、计时、记录、纠偏，不代答**；参考答案写成能说出口的连贯段落，不写成层级提纲；暴露的不会项要落成"具体补习动作 + 异题复验"，而不是只留一条记录。数据在 `data/`，不入库。
+
+岗位筛选与护城河判定见 [docs/岗位筛选规则.md](docs/岗位筛选规则.md)（含 S/A/B/C/伪 五级护城河、岗位降级规则、大厂外包专条、学历年限与国资控股准入的处理）。
+
 ## 许可
 
 MIT，见 [LICENSE](LICENSE)。

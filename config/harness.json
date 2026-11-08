@@ -12,7 +12,23 @@
           "steps": [
             { "tool": "cdp", "url": "{chat_url}", "cmd": "click", "arg": "{contact}", "note": "点会话（联系人姓名）" },
             { "tool": "cdp", "url": "{chat_url}", "cmd": "sendmsg", "arg": "{message}", "note": "execCommand('insertText') 插文本 + 点 button.btn-send" }
-          ]
+          ],
+          "batch": {
+            "status": "已实测",
+            "script": "boss_greet.js",
+            "search_api": "/wapi/zpgeek/search/joblist.json",
+            "greet_api": "/wapi/zpgeek/friend/add.json",
+            "cmd": "node harness/scripts/boss_greet.js --keyword \"<关键词>\" --city <城市码> --count <数量> [--dry-run]",
+            "delay_sec": [4, 10],
+            "daily_limit": 250,
+            "note": "浏览器 fetch 调 BOSS 原生 API（动态 __zp_stoken__，绕开 CDP JS 冻结）；搜索 API 一次返回 securityId/encryptJobId/lid；随机延迟 4-10s；code=9 退避 30s；单日上限 250"
+          },
+          "reply": {
+            "status": "已实测",
+            "script": "boss_reply.js",
+            "cmd": "node harness/scripts/boss_reply.js --contact \"<姓名或公司>\" --message \"<内容>\"",
+            "note": "选会话=div.friend-content 内文本匹配 + el.click()，校验 .friend-content.selected 含目标；插入文本后等 600ms 再点 button.btn-send（同步检查 disabled 会误判）"
+          }
         },
         "zhaopin": {
           "status": "选择器已定位",

@@ -262,8 +262,12 @@ async function setinput(selector, value) {
 
 async function sendmsg(text) {
   // BOSS 聊天发消息：contenteditable 用 execCommand('insertText') 才能触发框架（textContent+InputEvent 不生效）。
+  // 插入文本后需等框架点亮发送键（异步），再点发送；同步检查 disabled 会误判 SEND_DISABLED。
   const page = await getPageTarget();
-  const out = await evalOn(page, `(function(){var el=document.querySelector('#chat-input');if(!el)return 'NO_INPUT';el.focus();el.textContent='';document.execCommand('insertText',false,${JSON.stringify(text)});var btn=document.querySelector('button.btn-send');if(!btn)return 'NO_SEND';var dis=btn.className.includes('disabled');if(dis)return 'SEND_DISABLED';btn.click();return 'SENT';})()`);
+  const ins = await evalOn(page, `(function(){var el=document.querySelector('#chat-input');if(!el)return 'NO_INPUT';el.focus();el.textContent='';document.execCommand('insertText',false,${JSON.stringify(text)});return 'INSERTED';})()`);
+  if (ins !== 'INSERTED') { console.log(ins); return; }
+  await new Promise((r) => setTimeout(r, 600));
+  const out = await evalOn(page, `(function(){var b=document.querySelector('button.btn-send');if(!b)return 'NO_SEND';b.click();return 'SENT';})()`);
   console.log(out);
 }
 

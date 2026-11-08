@@ -77,7 +77,7 @@ def render_markdown(items, now):
 
     for jid, payload, row, app, ctx in items:
         lines += ['---', '', f'## {jid}｜{payload["company"]}｜{payload["title"]}', '']
-        lines += [f'- **城市/来源**：{payload["city"]} · {payload["observed_on"]}读取 · [原 JD]（{payload["source_url"]}）', '']
+        lines += [f'- **城市/来源**：{payload["city"]} · {payload.get("observed_on") or "未记录"}读取 · [原 JD]（{payload["source_url"]}）', '']
         entry = ctx.get('application_url') or payload.get('source_url')
         lines += [f'- **投递入口**：{entry}', '']
         if app:

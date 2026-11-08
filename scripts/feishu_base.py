@@ -118,7 +118,7 @@ def project_rows(db=DEFAULT_DB, now=None):
             '来源平台': source_platform(p['source_url']), '拟投平台': c.get('platform', '待确认'),
             '原JD链接': p['source_url'], '核验结论': [DECISIONS[job['decision']]],
             '当前阶段': [STAGES.get(stage, '研究线索')], '行业归属': p.get('industry', '待确认'),
-            '判断依据': job['reason'] or p['summary'], '下一行动': c.get('next_action') or p['next_action'],
+            '判断依据': job['reason'] or p.get('summary', ''), '下一行动': c.get('next_action') or p.get('next_action', ''),
             '下次检查': due, '最近响应摘要': latest_response[1].get('summary', '') if latest_response else '',
             '响应登记时间': latest_response[0]['at'] if latest_response else None,
             '简历SHA256': a.get('resume_hash', ''), 'JD版本': job['revision'],
