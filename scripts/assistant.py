@@ -14,8 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
 
-ROOT = Path(__file__).resolve().parents[2]
-from config import HOME as PROJECT, LEDGER as DEFAULT_DB
+from config import HOME as PROJECT, LEDGER as DEFAULT_DB, PROJECT_ROOT as ROOT
 KINDS = {'verify_jd', 'research_company', 'research_channel'}
 LEVELS = {'primary_full', 'secondary_full', 'partial'}
 DECISIONS = {'pending', 'clarify', 'exclude', 'shortlist'}

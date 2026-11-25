@@ -27,6 +27,21 @@ python -X utf8 scripts/interview_drill.py status
 
 每次工作结束先更新原台账或材料，再用 workspace.py close 更新现行决定。材料修改后未复审、范围与方向不一致、提交缺回执会直接提示，不能靠逐日文档猜进度。
 
+## 目录组织
+
+代码、方法、空模板与个人工作线在同一个项目根目录。harness 是工作机制的名称，不再是包住另一套工程的目录。
+
+```text
+offerloop/
+├── AGENTS.md / README.md
+├── scripts/  docs/  config/  templates/  tests/  skills/
+├── 行业线/  内容线/  笔面线/  投递线/
+├── memory/
+└── .local/  data/  offerloop.local.json
+```
+
+四条线和个人数据由初始化生成并被 Git 忽略，所有使用者采用同样的目录职责。
+
 ## 组织方式
 
 | 部分 | 持续职责 |
@@ -55,7 +70,7 @@ python -X utf8 scripts/interview_drill.py status
 
 新会话先读 AGENTS 和实例 memory/CURRENT_STATE.md，再进对应工作线，不需要旧会话记录。换设备只拉代码可开始新档案；继续原用户必须另行私下恢复 offerloop.local.json、.local、四条线、memory 和 data。SQLite 做一致性备份或停写后复制，浏览器和飞书重新认证。不要把个人资料提交到公开 Git。
 
-同机多用户用 `setup.py --workspace <独立目录>`，之后设置 OFFERLOOP_LOCAL 指向该目录的配置。已有外层个人工程 / 内层 harness 布局继续兼容。
+同机多用户用 `setup.py --workspace <独立目录>`，之后设置 OFFERLOOP_LOCAL 指向该目录的配置。仓库根目录就是工作根目录，无需额外嵌套 harness 文件夹。
 
 ## 可选工具及边界
 

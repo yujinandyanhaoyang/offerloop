@@ -23,3 +23,7 @@ node_modules/
 /memory/
 
 /credentials/
+
+/.project-handoffs/
+
+/.project-memory-history/

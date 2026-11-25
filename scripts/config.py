@@ -4,7 +4,7 @@
 - 本地实例：<repo>/offerloop.local.json 或 <repo>/../offerloop.local.json（相对路径按该文件所在目录解析）
 - OFFERLOOP_HOME      数据目录（台账/证据/回执，不入库），默认 <repo>/data
 - OFFERLOOP_CONFIG    项目配置目录（投递数据/执行策略/当前检索范围），默认 <repo>/config
-- OFFERLOOP_ADAPTERS  平台适配配置目录（harness/field_mapping/platforms/companies），默认同 CONFIG
+- OFFERLOOP_ADAPTERS  平台适配配置目录（harness.json、field_mapping.json、platforms.json、companies.json），默认同 CONFIG
 """
 import json
 import os

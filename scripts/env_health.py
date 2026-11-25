@@ -9,7 +9,7 @@
 纯 Python 标准库，无外部依赖。
 
 用法：
-    python -X utf8 harness/scripts/env_health.py [--db <sqlite>]
+    python -X utf8 scripts/env_health.py [--db <sqlite>]
     输出单份 JSON；也可被 overview.py / chain.py status 以 probe() 直接复用。
 """
 import argparse
