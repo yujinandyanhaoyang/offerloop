@@ -6,9 +6,9 @@
 - 跑测试：`python -X utf8 -m unittest discover -s tests -p "test_*.py"`。
 
 ## 新增平台
-1. 在 `config/platforms.json` 加平台选择器/搜索 URL/提交按钮。
-2. 在 `config/harness.json` 的 `greet/apply/update_resume` 加平台适配。
-3. 在 `config/field_mapping.json` 加表单字段映射（如需要）。
+1. 在 `scripts/config/platforms.json` 加平台选择器/搜索 URL/提交按钮。
+2. 在 `scripts/config/harness.json` 的 `greet/apply/update_resume` 加平台适配。
+3. 在 `scripts/config/field_mapping.json` 加表单字段映射（如需要）。
 4. 用 dry-run 验证：`chain.py submit` 只定位不点击。
 
 ## 边界

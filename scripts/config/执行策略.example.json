@@ -25,7 +25,7 @@
       "J4真实准入",
       "J5个人回报"
     ],
-    "backcheck_method": "docs/企业背调方法论.md",
+    "backcheck_method": "docs/行业线/企业背调方法论.md",
     "value_chain_checks": [
       "产业链位置与价值分配",
       "上游/客户健康度",

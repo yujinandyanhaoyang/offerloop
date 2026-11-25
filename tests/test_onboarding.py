@@ -22,11 +22,6 @@ class OnboardingTests(unittest.TestCase):
         for directory in ('scripts', 'docs', 'skills'):
             shutil.copytree(REPO / directory, self.repo / directory,
                             ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
-        (self.repo / 'config').mkdir()
-        for name in ('执行策略.example.json', '当前检索范围.example.json', '投递数据.example.json',
-                     'interview-harness.example.json', 'harness.json', 'field_mapping.json',
-                     'platforms.json', 'companies.json', '简历字段标签.json'):
-            shutil.copy2(REPO / 'config' / name, self.repo / 'config' / name)
         for name in ('AGENTS.md', 'README.md', '.gitignore', 'LICENSE'):
             shutil.copy2(REPO / name, self.repo / name)
         self.env = {k: v for k, v in os.environ.items() if not k.startswith('OFFERLOOP_')}
@@ -143,6 +138,15 @@ class OnboardingTests(unittest.TestCase):
         self.assertEqual(profile.read_text(encoding='utf-8'), '{"legacy": "keep exactly"}')
         self.assertEqual(Path(self.run_cli('interview_drill.py', 'status')['ledger']),
                          self.root / 'private-data/interview-ledger.json')
+        probe = [sys.executable, '-B', '-c',
+                 "import sys; sys.path.insert(0,'scripts'); from config import ADAPTERS; print(ADAPTERS)"]
+        effective = subprocess.run(probe, cwd=self.repo, env=self.env, capture_output=True,
+                                   text=True, encoding='utf-8', check=True)
+        self.assertEqual(Path(effective.stdout.strip()), self.repo / 'scripts/config')
+        custom = self.root / 'custom-adapters'
+        effective = subprocess.run(probe, cwd=self.repo, env=dict(self.env, OFFERLOOP_ADAPTERS=str(custom)),
+                                   capture_output=True, text=True, encoding='utf-8', check=True)
+        self.assertEqual(Path(effective.stdout.strip()), custom)
         env = dict(self.env, OFFERLOOP_LOCAL=str(self.root / 'missing.json'))
         self.run_cli('setup.py', env=env, success=False)
         self.run_cli('onboard.py', 'status', env=env, success=False)

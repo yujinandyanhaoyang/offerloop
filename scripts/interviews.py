@@ -17,13 +17,13 @@ from collections import Counter
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 CHINA_TZ = timezone(timedelta(hours=8))
-from config import FEISHU_DIR, PROJECT_ROOT, CONFIG as INSTANCE_CONFIG, REPO
+from config import FEISHU_DIR, PROJECT_ROOT, CONFIG as INSTANCE_CONFIG, REPO, BUNDLED_CONFIG
 
 WORKSPACE = PROJECT_ROOT
 PROJECT = WORKSPACE
 CONFIG = next((p for p in (INSTANCE_CONFIG / 'interview-harness.json',
     PROJECT / '笔面线' / 'interview-harness.json', PROJECT / '行业线' / 'interview-harness.json',
-    PROJECT / 'interview-harness.json') if p.is_file()), REPO / 'config' / 'interview-harness.example.json')
+    PROJECT / 'interview-harness.json') if p.is_file()), BUNDLED_CONFIG / 'interview-harness.example.json')
 TRACKS = {'社招', '校招', '实习', '招聘类型未明', '历史相邻参考'}
 HOSTS = {'www.nowcoder.com', 'nowcoder.com', 'api-cdn.nowcoder.com', 'ac.nowcoder.com', 'm.nowcoder.com'}
 
@@ -308,7 +308,7 @@ def main():
         if args.topic!='agent' and topic is None:raise ValueError('未知岗位主题；先在配置登记主题和独立绑定')
         profile=topic or config
         if not profile['search_terms']:
-            emit({'status': 'needs_topic', 'next': '复制 config/interview-harness.example.json 到实例配置目录，按目标岗位填写 search_terms'});return
+            emit({'status': 'needs_topic', 'next': '复制 scripts/config/interview-harness.example.json 到实例配置目录，按目标岗位填写 search_terms'});return
         dataset=PROJECT/profile['dataset']
         data=read(dataset) if dataset.exists() else {'entries':[]}
         binding_path = FEISHU_DIR / '求职材料云端绑定.json'

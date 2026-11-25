@@ -3,15 +3,16 @@
 优先级：环境变量 > 本地实例配置 offerloop.local.json > 通用默认。
 - 本地实例：<repo>/offerloop.local.json 或 <repo>/../offerloop.local.json（相对路径按该文件所在目录解析）
 - OFFERLOOP_HOME      数据目录（台账/证据/回执，不入库），默认 <repo>/data
-- OFFERLOOP_CONFIG    项目配置目录（投递数据/执行策略/当前检索范围），默认 <repo>/config
-- OFFERLOOP_ADAPTERS  平台适配配置目录（harness.json、field_mapping.json、platforms.json、companies.json），默认同 CONFIG
+- OFFERLOOP_CONFIG    个人执行配置目录，默认 <repo>/.local/config
+- OFFERLOOP_ADAPTERS  通用平台适配配置，默认 <repo>/scripts/config
 """
 import json
 import os
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent      # scripts/
-REPO = HERE.parent                          # harness 目录
+REPO = HERE.parent                          # 项目根目录
+BUNDLED_CONFIG = HERE / 'config'             # 公开适配与空配置，不能写个人资料
 
 _LOCAL = None
 _override = os.environ.get('OFFERLOOP_LOCAL')
@@ -43,11 +44,15 @@ def _resolve(key, env_name, default):
 
 
 HOME = _resolve('home', 'OFFERLOOP_HOME', REPO / 'data')
-CONFIG = _resolve('config', 'OFFERLOOP_CONFIG', REPO / 'config')
-ADAPTERS = _resolve('adapters', 'OFFERLOOP_ADAPTERS', CONFIG)
-PERSONAL = _resolve('personal', 'OFFERLOOP_PERSONAL', CONFIG)
+CONFIG = _resolve('config', 'OFFERLOOP_CONFIG', REPO / '.local' / 'config')
+ADAPTERS = _resolve('adapters', 'OFFERLOOP_ADAPTERS', BUNDLED_CONFIG)
+if (not os.environ.get('OFFERLOOP_ADAPTERS') and ADAPTERS == (REPO / 'config').resolve()
+        and not ADAPTERS.exists()):
+    # Only the former built-in location has moved; never redirect a custom adapter directory.
+    ADAPTERS = BUNDLED_CONFIG
+PERSONAL = _resolve('personal', 'OFFERLOOP_PERSONAL', REPO / '.local' / 'profile')
 
-# 项目实例根：offerloop.local.json 所在目录（无本地配置时退回 harness 目录）
+# 项目实例根：offerloop.local.json 所在目录（无本地配置时退回项目根目录）
 PROJECT_ROOT = _base
 
 # 数据（运行时/个人，不入库）

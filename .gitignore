@@ -9,6 +9,13 @@ config/resume.md
 config/resume.pdf
 config/photo.png
 config/connection.json
+scripts/config/投递数据.json
+scripts/config/执行策略.json
+scripts/config/当前检索范围.json
+scripts/config/resume.md
+scripts/config/resume.pdf
+scripts/config/photo.png
+scripts/config/connection.json
 *.sqlite3
 *.sqlite3-wal
 *.sqlite3-shm

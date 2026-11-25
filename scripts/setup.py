@@ -8,6 +8,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 TEMPLATES = REPO / 'scripts' / 'templates' / 'workspace'
+BUNDLED_CONFIG = REPO / 'scripts' / 'config'
 
 
 def relative(path, base):
@@ -42,7 +43,7 @@ def initialize(workspace=None):
                          if p.is_file()), REPO / 'offerloop.local.json')
     root = manifest.parent
     settings = {'home': 'data', 'config': '.local/config', 'personal': '.local/profile',
-                'adapters': relative(REPO / 'config', root),
+                'adapters': relative(BUNDLED_CONFIG, root),
                 'resume': '内容线/简历.md', 'attachments': '.local/profile'}
     created = []
     if write_missing(manifest, json.dumps(settings, ensure_ascii=False, indent=2) + '\n'):
@@ -61,7 +62,7 @@ def initialize(workspace=None):
     home = location('home', 'OFFERLOOP_HOME', 'data')
     for name, folder in [('执行策略', config), ('当前检索范围', config), ('投递数据', personal)]:
         target = folder / (name + '.json')
-        if write_missing(target, (REPO / 'config' / (name + '.example.json')).read_text(encoding='utf-8')):
+        if write_missing(target, (BUNDLED_CONFIG / (name + '.example.json')).read_text(encoding='utf-8')):
             created.append(str(target))
     for template in sorted(TEMPLATES.rglob('*')):
         if not template.is_file():

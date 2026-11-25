@@ -4,7 +4,7 @@
 
 ## 发现、核验与准备
 
-1. 未定方向先用 [筛选规则](岗位筛选规则.md) 探索。用户已接受的范围写入实例 config/当前检索范围.json，draft 不进入执行队列。
+1. 未定方向先用 [筛选规则](行业线/岗位筛选规则.md) 探索。用户已接受的范围写入实例 config/当前检索范围.json，draft 不进入执行队列。
 2. `python -X utf8 scripts/pipeline.py plan` 读取当前状态和下一动作，命令本身不联网。`start` 认领一个研究批次，只有准备执行时才调用；异常后先对账再继续。
 3. 使用当前助手支持的公开检索工具核原 JD，区分在招状态、身份硬条件与个人证据。岗位数据以 `assistant.py import <私有岗位JSON>` 入库；字段结构参考 scripts/assistant.py 和 tests/test_assistant.py 中的纯测试样本，不能把样本作为真实岗位。
 4. 公司与岗位证据使用 `chain.py screen` 生成待核卡，填写真实证据后用 check 校验，shortlist 写回结论。不同判定的未知与否决原因不得抹平。
