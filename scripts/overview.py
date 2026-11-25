@@ -3,26 +3,28 @@
 """OfferLoop 总览（统一入口）。
 
 只读：读台账 ledger.sqlite3、记忆 memory/、能力配置 harness.json、证据卡 hold 标记，
-生成自包含 总览.html（offerloop 项目根），并打印控制台摘要。
+在实例数据目录生成自包含的总览，并打印控制台摘要。
 不写台账、不改记忆；纯 Python 标准库，无外部依赖。
 
 用法：python -X utf8 harness/scripts/overview.py
 """
 import html
 import json
+import os
 import sqlite3
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from config import LEDGER, CONFIG, ADAPTERS, REPO
+from config import LEDGER, CONFIG, ADAPTERS, PROJECT_ROOT, REPO
+from scope import SCREENING_RULES
 
-ROOT = REPO.parent                      # offerloop 项目根
+ROOT = PROJECT_ROOT
 MEMORY = ROOT / 'memory'
 CARDS = LEDGER.parent / 'chain' / '证据卡'
 HARNESS_JSON = ADAPTERS / 'harness.json'
-OUT = ROOT / '总览.html'
+OUT = LEDGER.parent / '总览.html'
 
 DECISIONS = {'pending': '待核验', 'clarify': '待澄清', 'exclude': '已排除', 'shortlist': '初筛候选'}
 PLATFORM_LABEL = {'boss': 'BOSS', 'zhaopin': '智联', 'example': '示例官网'}
@@ -39,6 +41,16 @@ JS_FILTER = '''<script>
 
 def esc(v):
     return html.escape(str(v), quote=True)
+
+
+def local_link(label, path):
+    if not path.is_file():
+        return ''
+    try:
+        href = Path(os.path.relpath(path, OUT.parent)).as_posix()
+    except ValueError:
+        href = path.resolve().as_uri()
+    return f'<a href="{esc(href)}">{esc(label)}</a>'
 
 
 def bj(iso):
@@ -194,7 +206,7 @@ def build():
     ready_cnt = sum(1 for a in apps.values() if a['stage'] == 'ready')
 
     idx = read_json(MEMORY / 'project-memory.json')
-    active_phase = idx.get('active_phase', '?')
+    active_phase = idx.get('active_phase')
     phase_title = ''
     phase_path = ''
     phases = idx.get('phases', {})
@@ -206,10 +218,9 @@ def build():
     lc = idx.get('latest_checkpoint', {})
     handoff = ROOT.parent.parent / '.project-handoffs' / '20261031-offerloop-restructure.json'
 
-    # 下一动作：CURRENT_STATE 与 ROADMAP
+    # 下一动作来自当前接续入口
     cs_text = (MEMORY / 'CURRENT_STATE.md').read_text(encoding='utf-8') if (MEMORY / 'CURRENT_STATE.md').is_file() else ''
-    rm_text = (MEMORY / 'ROADMAP.md').read_text(encoding='utf-8') if (MEMORY / 'ROADMAP.md').is_file() else ''
-    next_actions = md_items(cs_text, '## 下一动作与停止条件') or md_items(rm_text, '## 近期')
+    next_actions = md_items(cs_text, '## 下一动作与停止条件') or md_items(cs_text, '## 待确认与下一步')
 
     # ready 短名单（decision=shortlist）
     ready = []
@@ -277,13 +288,15 @@ def build():
 
     # 阶段
     stage_html = ('<div class="cards">'
-                  + stat_card('当前阶段', '阶段 %s' % active_phase, 'ok')
+                  + stat_card('当前阶段', ('阶段 %s' % active_phase) if active_phase else '按当前接续推进', 'ok')
                   + stat_card('阶段名', phase_title or '?')
                   + stat_card('最新检查点', lc.get('id', '—'))
                   + stat_card('真实投递回执', submitted)
                   + '</div>')
     if phase_path:
-        stage_html += '<p class="muted">阶段文件：<a href="%s">%s</a></p>' % (esc(phase_path), esc(phase_path))
+        stage_link = local_link('查看阶段文件', ROOT / phase_path)
+        if stage_link:
+            stage_html += f'<p class="muted">{stage_link}</p>'
     parts.append(section('现在到哪了', stage_html))
 
     # 环境就绪
@@ -332,18 +345,22 @@ def build():
     if next_actions:
         todo = ''.join('<li>%s</li>' % esc(x) for x in next_actions)
     else:
-        todo = '<li class="muted">见 ROADMAP / CURRENT_STATE。</li>'
-    parts.append(section('下一步', '<ul class="todo">%s</ul><p class="muted">来源：<a href="memory/CURRENT_STATE.md">CURRENT_STATE</a> · <a href="memory/ROADMAP.md">ROADMAP</a></p>' % todo))
+        todo = '<li class="muted">见 memory/CURRENT_STATE.md。</li>'
+    parts.append(section('下一步', '<ul class="todo">%s</ul>' % todo))
 
     # 统一导航
-    nav = '<div class="nav"><ul>'
-    nav += '<li>启动：<a href="启动浏览器.cmd">启动浏览器.cmd</a>（CDP 9222）· <a href="harness/scripts/browser_launch.cmd">browser_launch.cmd</a> · <a href="harness/scripts/overview.py">overview.py</a></li>'
-    nav += '<li><a href="README.md">README</a> · <a href=".local/offerloop/求职台账.html">求职台账（明细）</a> · <a href="投递线/投递清单.md">投递清单</a> · <a href="投递线/候选暂挂名单.md">候选暂挂名单</a></li>'
-    nav += '<li>规则：<a href="规则/职业适配工作流.md">职业适配工作流</a> · <a href="规则/AI时代公司与岗位过滤器.md">公司与岗位过滤器</a> · <a href="规则/企业背调方法论.md">企业背调方法论</a> · <a href="投递线/执行策略.json">执行策略</a></li>'
-    nav += '<li>手册：<a href="harness/docs/RUNBOOK.md">RUNBOOK</a> · <a href="harness/docs/能力手册.md">能力手册</a> · <a href="harness/docs/海投链路.md">海投链路</a> · <a href="harness/docs/INTERVIEWS.md">面经工具</a></li>'
-    nav += '<li>记忆：<a href="memory/CURRENT_STATE.md">当前状态</a> · <a href="memory/ROADMAP.md">路线图</a> · <a href="memory/DECISIONS.md">决策</a> · <a href="memory/PROJECT_GOAL.md">目标</a> · <a href="memory/checkpoints/C-002.md">检查点 C-002</a></li>'
-    nav += '<li>证据与交接：<a href=".local/offerloop/chain/证据卡/">证据卡目录</a> · <a href=".local/offerloop/平台接入状态.json">平台接入状态</a> · <a href="../../.project-handoffs/20261031-offerloop-restructure.json">交接清单</a></li>'
-    nav += '</ul></div>'
+    links = [
+        ('项目入口', ROOT / 'README.md'), ('行业方向', ROOT / '行业线/README.md'),
+        ('公司与岗位过滤器', SCREENING_RULES), ('笔面准备', ROOT / '笔面线/README.md'),
+        ('投递与跟进', ROOT / '投递线/README.md'), ('求职台账', LEDGER.parent / '求职台账.html'),
+        ('接续记忆', MEMORY / 'CURRENT_STATE.md'), ('执行手册', REPO / 'docs/RUNBOOK.md'),
+    ]
+    items = []
+    for label, path in links:
+        link = local_link(label, path)
+        if link:
+            items.append(f'<li>{link}</li>')
+    nav = '<div class="nav"><ul>' + ''.join(items) + '</ul></div>'
     parts.append(section('统一导航', nav))
 
     parts.append('<p class="muted">生成命令：<span class="mono">python -X utf8 harness/scripts/overview.py</span>（只读；台账更新后重跑即可刷新）</p>')
@@ -363,6 +380,7 @@ def build():
 
 def main():
     html_text, summary = build()
+    OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(html_text, encoding='utf-8')
     summary_path = LEDGER.parent / 'overview-summary.json'
     summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')

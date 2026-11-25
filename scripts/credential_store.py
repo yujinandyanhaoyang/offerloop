@@ -1,6 +1,6 @@
 """本地凭据加密存储（Windows DPAPI，仅当前 Windows 用户可解密）。
 
-凭据存 <项目根>/credentials/<key>.bin（DPAPI 加密，无独立密钥文件，目录已 gitignore）。
+凭据存 <实例根>/.local/credentials/<key>.bin（DPAPI 加密，无独立密钥文件，目录已 gitignore）。
 secret 走 stdin 传入，不经过命令行（避免进程列表泄露）。get 只供程序内部调用，禁止回显/写日志。
 
 用法：
@@ -12,10 +12,12 @@ secret 走 stdin 传入，不经过命令行（避免进程列表泄露）。get
 import ctypes
 import json
 import sys
-from pathlib import Path
+from config import PROJECT_ROOT
 
-ROOT = Path(__file__).resolve().parents[2]
-DIR = ROOT / 'credentials'
+DIR = PROJECT_ROOT / '.local' / 'credentials'
+LEGACY_DIR = PROJECT_ROOT / 'credentials'
+if not DIR.exists() and LEGACY_DIR.is_dir():
+    DIR = LEGACY_DIR
 
 
 class DATA_BLOB(ctypes.Structure):

@@ -1,0 +1,9 @@
+{
+  "project_id": "offerloop",
+  "dataset": "笔面线/题源.json",
+  "evidence": ".local/interviews/evidence.json",
+  "search_terms": [],
+  "tool_routes": {"search": "当前助手已接入的搜索工具", "read": "原帖正文读取", "publish": "仅明确授权后使用云端工具"},
+  "stop": {"max_sources_per_batch": 5, "max_attempts_per_source": 2},
+  "topics": {}
+}

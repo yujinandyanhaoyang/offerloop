@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 import os
+import shutil
 import sqlite3
 import subprocess
 import time
@@ -33,8 +34,10 @@ def cli(args, logdir, write=False):
     request = logdir / (uuid.uuid4().hex + '.json')
     envelope = {'args': args, 'write': write, 'status': 'pending'}
     atomic(request, envelope)
-    exe = os.environ.get('FEISHU_CLI_EXE') or str(
-        Path(os.environ.get('APPDATA', '')) / 'npm/node_modules/@larksuite/cli/bin/lark-cli.exe')
+    npm_exe = Path(os.environ.get('APPDATA', '')) / 'npm/node_modules/@larksuite/cli/bin/lark-cli.exe'
+    exe = os.environ.get('FEISHU_CLI_EXE')
+    if not exe:
+        exe = str(npm_exe) if npm_exe.is_file() else shutil.which('lark-cli') or 'lark-cli'
     env = dict(os.environ, LARKSUITE_CLI_NO_UPDATE_NOTIFIER='1', LARKSUITE_CLI_NO_SKILLS_NOTIFIER='1')
     try:
         r = subprocess.run([exe, 'base', *args, '--as', 'user'], cwd=ROOT,
@@ -139,7 +142,7 @@ def project_rows(db=DEFAULT_DB, now=None):
             '事件摘要': d.get('summary') or d.get('reason', ''), '登记时间': ev['at'],
             '原JD链接': p['source_url'], '证据定位': '本地事件号 ' + str(ev['id']),
             '下一行动': context.get(jid, {}).get('next_action', '')})
-    platforms = json.loads((PLATFORM_STATE).read_text(encoding='utf-8'))
+    platforms = json.loads(PLATFORM_STATE.read_text(encoding='utf-8')) if PLATFORM_STATE.is_file() else {'platforms': {}}
     platform_rows = [{'平台': name, '官网入口': p['homepage'], '资料状态': p.get('profile_status', '待核'),
         '自动操作状态': p.get('automation_status', '待实时验证'),
         '投递验证': '已取得真实回执' if p.get('submission_verified') else '未完成真实投递验证',

@@ -14,14 +14,15 @@ HERE = Path(__file__).resolve().parent      # scripts/
 REPO = HERE.parent                          # harness 目录
 
 _LOCAL = None
-for _cand in (REPO / 'offerloop.local.json', REPO.parent / 'offerloop.local.json'):
+_override = os.environ.get('OFFERLOOP_LOCAL')
+_candidates = (Path(_override),) if _override else (
+    REPO / 'offerloop.local.json', REPO.parent / 'offerloop.local.json')
+for _cand in _candidates:
     if _cand.is_file():
         _LOCAL = _cand
         break
-if _LOCAL is None and os.environ.get('OFFERLOOP_LOCAL'):
-    _p = Path(os.environ['OFFERLOOP_LOCAL'])
-    if _p.is_file():
-        _LOCAL = _p
+if _override and _LOCAL is None:
+    raise FileNotFoundError(f'OFFERLOOP_LOCAL does not exist: {_override}')
 
 _cfg = {}
 _base = REPO
@@ -44,6 +45,7 @@ def _resolve(key, env_name, default):
 HOME = _resolve('home', 'OFFERLOOP_HOME', REPO / 'data')
 CONFIG = _resolve('config', 'OFFERLOOP_CONFIG', REPO / 'config')
 ADAPTERS = _resolve('adapters', 'OFFERLOOP_ADAPTERS', CONFIG)
+PERSONAL = _resolve('personal', 'OFFERLOOP_PERSONAL', CONFIG)
 
 # 项目实例根：offerloop.local.json 所在目录（无本地配置时退回 harness 目录）
 PROJECT_ROOT = _base
@@ -59,8 +61,9 @@ PLATFORM_STATE = HOME / '平台接入状态.json'
 # 项目配置
 POLICY = CONFIG / '执行策略.json'
 SCOPE = CONFIG / '当前检索范围.json'
-PROFILE = CONFIG / '投递数据.json'
-RESUME = CONFIG / 'resume.md'
+PROFILE = PERSONAL / '投递数据.json'
+RESUME = _resolve('resume', 'OFFERLOOP_RESUME', PERSONAL / 'resume.md')
+ATTACHMENTS = _resolve('attachments', 'OFFERLOOP_ATTACHMENTS', HOME)
 READY_OUTPUT = HOME / '投递清单.md'
 
 # 平台适配配置

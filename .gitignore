@@ -1,5 +1,7 @@
 # 数据与个人配置（不入库）
 data/
+.local/
+offerloop.local.json
 config/投递数据.json
 config/执行策略.json
 config/当前检索范围.json
@@ -14,3 +16,10 @@ __pycache__/
 *.pyc
 node_modules/
 .DS_Store
+/行业线/
+/内容线/
+/笔面线/
+/投递线/
+/memory/
+
+/credentials/

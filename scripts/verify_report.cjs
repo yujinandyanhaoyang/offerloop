@@ -2,7 +2,7 @@
 const {chromium}=require('playwright');
 const fs=require('fs'),path=require('path'),{pathToFileURL}=require('url');
 (async()=>{
- const root=process.env.OFFERLOOP_HOME||path.resolve(__dirname,'..');
+ const root=process.env.OFFERLOOP_HOME||path.resolve(__dirname,'../data');
  const browser=await chromium.launch({headless:true});
  try {
   const page=await browser.newPage({viewport:{width:1440,height:900}}),errors=[];
@@ -17,11 +17,11 @@ const fs=require('fs'),path=require('path'),{pathToFileURL}=require('url');
   await page.locator('#search').fill('APP-001');
   result.search=await page.locator('#opportunities tbody tr:visible').count()===1;
   await page.locator('#search').fill('');
-  await page.screenshot({path:path.join(root,'.local/offerloop/台账预览.png'),fullPage:true});
+  await page.screenshot({path:path.join(root,'台账预览.png'),fullPage:true});
   await page.setViewportSize({width:760,height:900});
   result.mobile=await page.evaluate(()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth}));
   result.errors=errors;delete result.text;
-  fs.writeFileSync(path.join(root,'.local/offerloop/页面核验.json'),JSON.stringify(result,null,2));
+  fs.writeFileSync(path.join(root,'页面核验.json'),JSON.stringify(result,null,2));
   console.log(JSON.stringify(result));
   if(result.rows<6||result.links<result.rows||!result.platformFilter||!result.search||errors.length||result.scrollWidth>result.width||result.mobile.scrollWidth>result.mobile.width)process.exitCode=1;
  } finally {await browser.close();}

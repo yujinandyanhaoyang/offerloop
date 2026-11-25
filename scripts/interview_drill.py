@@ -12,10 +12,9 @@ import argparse
 import json
 import pathlib
 import sys
+from config import HOME
 
-SCRIPT_DIR = pathlib.Path(__file__).resolve().parent
-ROOT = SCRIPT_DIR.parent
-DEFAULT_LEDGER = ROOT / "data" / "interview-ledger.json"
+DEFAULT_LEDGER = HOME / "interview-ledger.json"
 BATCH_SIZE = 5
 
 REQUIRED = ("qid", "date", "source", "company", "question", "answer_status")

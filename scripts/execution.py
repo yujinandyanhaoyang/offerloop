@@ -12,7 +12,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent
-from config import HOME as PROJECT, ADAPTERS, CONFIG
+from config import ADAPTERS, ATTACHMENTS, PROFILE
 
 
 def read(path):
@@ -101,8 +101,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command', choices=['routes', 'prepare'])
     parser.add_argument('--platform')
-    parser.add_argument('--data', type=Path, default=CONFIG / '投递数据.json')
-    parser.add_argument('--base-dir', type=Path, default=PROJECT, help='base for relative attachment paths; default: career project')
+    parser.add_argument('--data', type=Path, default=PROFILE)
+    parser.add_argument('--base-dir', type=Path, default=ATTACHMENTS, help='base for relative attachment paths')
     parser.add_argument('--output', type=Path, help='new private JSON file; contains personal values; never overwrite')
     args = parser.parse_args()
     routes = registry()

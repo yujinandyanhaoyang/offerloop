@@ -3,7 +3,14 @@ import hashlib
 import json
 from datetime import date
 from pathlib import Path
-from config import SCOPE as CAMPAIGN, PROJECT_ROOT
+from config import SCOPE as CAMPAIGN, PROJECT_ROOT, REPO
+
+SCREENING_RULES = next(
+    (PROJECT_ROOT / directory / 'AI时代公司与岗位过滤器.md'
+     for directory in ('行业线', '规则')
+     if (PROJECT_ROOT / directory / 'AI时代公司与岗位过滤器.md').is_file()),
+    REPO / 'docs' / '岗位筛选规则.md',
+)
 
 
 def read_campaign(path=CAMPAIGN):
@@ -15,13 +22,14 @@ def validate(campaign):
         return 'invalid_direction_confirmation'
     if campaign.get('status') != 'confirmed':
         return 'awaiting_direction_confirmation'
-    for key in ('id', 'confirmation_reference', 'confirmed_on'):
+    for key in ('id', 'confirmation_reference'):
         if not isinstance(campaign.get(key), str) or not campaign[key].strip():
             return 'invalid_direction_confirmation'
-    try:
-        date.fromisoformat(campaign['confirmed_on'])
-    except ValueError:
-        return 'invalid_direction_confirmation'
+    if 'confirmed_on' in campaign:
+        try:
+            date.fromisoformat(campaign['confirmed_on'])
+        except (TypeError, ValueError):
+            return 'invalid_direction_confirmation'
     cells = campaign.get('cells')
     if not isinstance(cells, list) or not cells:
         return 'empty_search_scope'
@@ -82,7 +90,7 @@ def search_plan(cell, today):
                             '细分领先证据及比较范围', '赚钱能力与现金／回款依据',
                             '公司C1-C5与岗位J1-J5', '本阶段关键缺口与面试核验项',
                             '筛选规则版本', '结论及下一行动'],
-        'screening_rules_path': str(PROJECT_ROOT / '规则' / 'AI时代公司与岗位过滤器.md'),
+        'screening_rules_path': str(SCREENING_RULES),
         'evidence_policy': '按初筛、争取名单、面试与offer分阶段核验；有效招聘必要，急招用于排序；查询命中不代表业务或岗位通过。',
         'note': '仅生成检索任务；需使用当前受支持公开工具取得证据，不代表已联网或在招。'
     }

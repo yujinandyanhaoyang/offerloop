@@ -1,3 +1,4 @@
+import _bootstrap  # noqa: F401
 import copy
 import importlib.util
 import unittest
@@ -12,7 +13,8 @@ if MODULE_PATH.is_file():
 else:
     tool = None
 
-_READY = tool is not None and Path(tool.CONFIG).is_file()
+_READY = tool is not None and Path(tool.CONFIG).is_file() and (
+    tool.PROJECT / tool.read(tool.CONFIG)['dataset']).is_file()
 
 
 @unittest.skipUnless(_READY, 'interview-harness.json 配置不在本仓库（项目级数据），跳过')

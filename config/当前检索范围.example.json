@@ -1,18 +1,9 @@
 {
   "schema_version": 1,
-  "id": "my-scope-20261031",
-  "status": "confirmed",
-  "confirmed_on": "2026-10-31",
-  "confirmation_reference": "本人确认",
-  "cells": [
-    {
-      "id": "CELL-1",
-      "industry_id": "AGENT",
-      "industry": "业务流程型Agent应用研发",
-      "city": "杭州",
-      "role_terms": ["Agent 应用开发 社招", "AI应用研发 工具调用"]
-    }
-  ],
-  "selection_boundary": "只在确认岗位族内增量核验；逐岗核社招身份/年限/地点/状态。",
+  "id": "my-search-scope",
+  "status": "draft",
+  "confirmation_reference": "",
+  "cells": [],
+  "selection_boundary": "每个检索单元包含 id、industry_id、industry、city 与 role_terms。",
   "external_actions_enabled": false
 }

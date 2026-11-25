@@ -2,7 +2,7 @@
 
 ## 提交前
 - 不提交个人数据：姓名、手机、邮箱、简历、真实台账、`.local/` 下的私有证据。
-- 配置改动只改 `*.example.json` 模板，不改真实 `config/*.json`（已在 `.gitignore`）。
+- 个人配置只改私有实例；通用适配器可改 config 中的公开配置，空模板使用 *.example.json。
 - 跑测试：`python -X utf8 -m unittest discover -s tests -p "test_*.py"`。
 
 ## 新增平台
@@ -13,4 +13,4 @@
 
 ## 边界
 - 不新增自动登录、验证码识别、绕过平台安全检查。
-- 默认 dry-run；真实外发需使用者显式授权且仅外包岗。
+- 默认 dry-run；真实外发须相应明确授权。现有 chain submit 只支持外包岗位，不代表通用择业规则。

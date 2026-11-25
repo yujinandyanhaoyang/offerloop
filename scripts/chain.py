@@ -180,7 +180,7 @@ def cmd_submit(a):
         for jid, payload, ctx, app in register_only:
             print('[登记不投] %s｜%s｜%s' % (jid, payload.get('company'), payload.get('title')))
         if not outsourcing:
-            print('无外包岗处于 ready；先 chain.py screen 生成证据卡→填卡→chain.py check→pipeline.py prepare 造样本（见海投链路.md）。')
+            print('无外包岗处于 ready；先 chain.py screen 生成证据卡→填卡→chain.py check→pipeline.py prepare 准备材料（见 docs/RUNBOOK.md）。')
             return 0
         for jid, payload, ctx, app in outsourcing:
             platform = (ctx.get('platform') or '').strip()

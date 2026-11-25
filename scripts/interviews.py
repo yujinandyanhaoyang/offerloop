@@ -14,13 +14,16 @@ import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 from collections import Counter
-from datetime import date, datetime
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
-from zoneinfo import ZoneInfo
+CHINA_TZ = timezone(timedelta(hours=8))
+from config import FEISHU_DIR, PROJECT_ROOT, CONFIG as INSTANCE_CONFIG, REPO
 
-WORKSPACE = Path(__file__).resolve().parents[2]
+WORKSPACE = PROJECT_ROOT
 PROJECT = WORKSPACE
-CONFIG = PROJECT / 'interview-harness.json'
+CONFIG = next((p for p in (INSTANCE_CONFIG / 'interview-harness.json',
+    PROJECT / '笔面线' / 'interview-harness.json', PROJECT / '行业线' / 'interview-harness.json',
+    PROJECT / 'interview-harness.json') if p.is_file()), REPO / 'config' / 'interview-harness.example.json')
 TRACKS = {'社招', '校招', '实习', '招聘类型未明', '历史相邻参考'}
 HOSTS = {'www.nowcoder.com', 'nowcoder.com', 'api-cdn.nowcoder.com', 'ac.nowcoder.com', 'm.nowcoder.com'}
 
@@ -74,7 +77,7 @@ def source_key(source):
 def validate(data, evidence):
     start = date.fromisoformat(data['range']['since'])
     end = date.fromisoformat(data['range']['until'])
-    today = datetime.now(ZoneInfo('Asia/Shanghai')).date()
+    today = datetime.now(CHINA_TZ).date()
     if start > end or end > today:
         raise ValueError('范围倒置或包含尚未发生的日期')
     ids, urls, identities, flows = set(), set(), set(), set()
@@ -150,7 +153,7 @@ def collect_one(url, previous=None, refresh=False, max_attempts=2):
     if attempts >= max_attempts:
         return previous, None, 'attempt_limit'
     item = {'url': url, 'attempts': attempts + 1,
-            'retrieved_at': datetime.now(ZoneInfo('Asia/Shanghai')).isoformat()}
+            'retrieved_at': datetime.now(CHINA_TZ).isoformat()}
     try:
         opener = urllib.request.build_opener(RestrictedRedirect())
         with opener.open(urllib.request.Request(url, headers={'User-Agent':'Mozilla/5.0'}), timeout=20) as response:
@@ -175,7 +178,7 @@ def collect_one(url, previous=None, refresh=False, max_attempts=2):
         for key in ('createTime', 'createdAt', 'editTime', 'showTime'):
             value = data.get(key)
             if isinstance(value, (int,float)) and value > 1e11:
-                dates[key] = {'timestamp_ms': value, 'iso': datetime.fromtimestamp(value/1000, ZoneInfo('Asia/Shanghai')).isoformat()}
+                dates[key] = {'timestamp_ms': value, 'iso': datetime.fromtimestamp(value/1000, CHINA_TZ).isoformat()}
         item.update(status='original_body_read', title=data.get('title'),
                     author=brief.get('nickname') or brief.get('name') or brief.get('userName'),
                     uuid=data.get('uuid'), dates=dates, body_chars=len(body), short_excerpt=body[:100],
@@ -293,19 +296,25 @@ def main():
         if args.output:save(args.output,result)
         emit(result);return
     config=read(CONFIG)
-    if read(PROJECT/'memory'/'project-memory.json')['project_id']!=config['project_id']:
+    memory_config = PROJECT / 'memory' / 'project-memory.json'
+    if memory_config.is_file() and read(memory_config)['project_id']!=config['project_id']:
         raise ValueError('不是目标求职项目')
     if args.command=='plan':
-        end=date.fromisoformat(args.until) if args.until else datetime.now(ZoneInfo('Asia/Shanghai')).date()
+        end=date.fromisoformat(args.until) if args.until else datetime.now(CHINA_TZ).date()
         month_index=end.year*12+end.month-2;year,month=divmod(month_index,12);month+=1
         start=date.fromisoformat(args.since) if args.since else date(year,month,min(end.day,calendar.monthrange(year,month)[1]))
-        if start>end or end>datetime.now(ZoneInfo('Asia/Shanghai')).date():raise ValueError('日期范围无效')
+        if start>end or end>datetime.now(CHINA_TZ).date():raise ValueError('日期范围无效')
         topic=config.get('topics',{}).get(args.topic)
         if args.topic!='agent' and topic is None:raise ValueError('未知岗位主题；先在配置登记主题和独立绑定')
         profile=topic or config
+        if not profile['search_terms']:
+            emit({'status': 'needs_topic', 'next': '复制 config/interview-harness.example.json 到实例配置目录，按目标岗位填写 search_terms'});return
         dataset=PROJECT/profile['dataset']
         data=read(dataset) if dataset.exists() else {'entries':[]}
-        binding=read(PROJECT/'求职材料云端绑定.json')
+        binding_path = FEISHU_DIR / '求职材料云端绑定.json'
+        if not binding_path.is_file():
+            binding_path = PROJECT / '求职材料云端绑定.json'
+        binding = read(binding_path) if binding_path.is_file() else {}
         emit({'topic':args.topic,'range':{'since':str(start),'until':str(end)},'queries':[f'{term} 面经 {start} {end}' for term in profile['search_terms']],
               'known_source_urls':sorted({canonical_url(s['url']) for e in data['entries'] for s in e['sources']}),
               'existing_document':binding.get(profile.get('binding_key','agent_interview_library')),'tool_routes':config['tool_routes'],
