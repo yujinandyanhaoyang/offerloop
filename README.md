@@ -34,7 +34,7 @@ python -X utf8 scripts/interview_drill.py status
 ```text
 offerloop/
 ├── AGENTS.md / README.md
-├── scripts/  docs/  config/  templates/  tests/  skills/
+├── scripts/  docs/  config/  tests/  skills/
 ├── 内容线/  笔面线/
 ├── memory/
 └── .local/  data/  offerloop.local.json
@@ -48,7 +48,7 @@ offerloop/
 | --- | --- |
 | AGENTS.md / README.md | 助手约定与用户入口 |
 | docs/ | 可复用筛选、背调、材料与训练方法，工具说明 |
-| templates/workspace/ | 材料、笔面入口与接续记忆的空模板，初始化时生成私有工作文件 |
+| scripts/templates/workspace/ | 初始化脚本使用的空模板；只定义新实例初始结构，不保存个人事实，日常不编辑模板 |
 | config/ | 通用平台适配与 example 模板 |
 | scripts/ / tests/ / skills/ | 执行代码、验证和可选训练工作流 |
 | .local/profile/ | 唯一个人条件与偏好来源，四条线共同引用 |

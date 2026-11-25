@@ -19,7 +19,7 @@ class OnboardingTests(unittest.TestCase):
         self.repo = self.root / 'checkout'
         self.repo.mkdir()
         # Only public source/template files; never copy a developer's private instance.
-        for directory in ('scripts', 'docs', 'skills', 'templates'):
+        for directory in ('scripts', 'docs', 'skills'):
             shutil.copytree(REPO / directory, self.repo / directory,
                             ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
         (self.repo / 'config').mkdir()

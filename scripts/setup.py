@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
+TEMPLATES = REPO / 'scripts' / 'templates' / 'workspace'
 
 
 def relative(path, base):
@@ -62,10 +63,10 @@ def initialize(workspace=None):
         target = folder / (name + '.json')
         if write_missing(target, (REPO / 'config' / (name + '.example.json')).read_text(encoding='utf-8')):
             created.append(str(target))
-    for template in sorted((REPO / 'templates' / 'workspace').rglob('*')):
+    for template in sorted(TEMPLATES.rglob('*')):
         if not template.is_file():
             continue
-        target = root / template.relative_to(REPO / 'templates' / 'workspace')
+        target = root / template.relative_to(TEMPLATES)
         values = {'METHODS': REPO / 'docs', 'HARNESS': REPO, 'PROFILE': personal / '投递数据.json',
                   'SCOPE': config / '当前检索范围.json', 'POLICY': config / '执行策略.json', 'DATA': home}
         content = template.read_text(encoding='utf-8')
