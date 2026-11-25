@@ -12,9 +12,9 @@ import argparse
 import json
 import pathlib
 import sys
-from config import HOME
+from config import INTERVIEW_LEDGER, INTERVIEW_BATCHES, INTERVIEW_BATCH_PATTERN
 
-DEFAULT_LEDGER = HOME / "interview-ledger.json"
+DEFAULT_LEDGER = INTERVIEW_LEDGER
 BATCH_SIZE = 5
 
 REQUIRED = ("qid", "date", "source", "company", "question", "answer_status")
@@ -81,7 +81,7 @@ def cmd_add(args, ledger):
 def cmd_batches(args, ledger):
     data = load(ledger)
     ordered = assign_batches(data.get("training_records", []))
-    outdir = ledger.parent / "batches"
+    outdir = INTERVIEW_BATCHES if ledger.resolve() == DEFAULT_LEDGER.resolve() else ledger.parent / "batches"
 
     grouped = {}
     for r in ordered:
@@ -89,7 +89,10 @@ def cmd_batches(args, ledger):
 
     written = []
     for no, items in sorted(grouped.items()):
-        path = outdir / f"batch-{no:02d}.md"
+        name = INTERVIEW_BATCH_PATTERN.format(batch=no) if ledger.resolve() == DEFAULT_LEDGER.resolve() else f"batch-{no:02d}.md"
+        if pathlib.Path(name).name != name:
+            raise ValueError('批次文件模式不能包含目录')
+        path = outdir / name
         content = render_batch(no, items)
         outdir.mkdir(parents=True, exist_ok=True)
         if path.exists() and path.read_text(encoding="utf-8") == content:
@@ -122,6 +125,7 @@ def cmd_status(args, ledger):
     recs = data.get("training_records", [])
     print(json.dumps({
         "total": len(recs),
+        "training_total": len(recs),
         "pending_sync": len([r for r in recs if r.get("sync_state") != "已同步"]),
         "by_batch": {no: len([r for r in recs if r.get("batch") == no])
                      for no in sorted({r.get("batch") for r in recs if r.get("batch")})},
@@ -152,6 +156,9 @@ def main():
 
     args = ap.parse_args()
     args.func(args, pathlib.Path(args.ledger))
+    if args.cmd != 'status':
+        from workspace import refresh_after_write
+        refresh_after_write()
 
 
 if __name__ == "__main__":

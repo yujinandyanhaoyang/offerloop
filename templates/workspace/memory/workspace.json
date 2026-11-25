@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "source": "尚未建档",
+  "direction": {
+    "status": "待研究",
+    "primary": [],
+    "parallel": [],
+    "deferred": [],
+    "reason": "先了解个人条件和真实需求，再形成推荐。",
+    "scope_hash": ""
+  },
+  "materials": [],
+  "next_actions": [
+    "通过对话建档，推进当前最需要的一条工作线。"
+  ],
+  "open_questions": [],
+  "retained_constraints": [],
+  "cloud": {
+    "url": "",
+    "note": "尚未接入；本地台账可独立工作。"
+  }
+}

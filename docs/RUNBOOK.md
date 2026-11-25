@@ -18,7 +18,7 @@
 
 只准备好材料不能写 submitted。结果未知先核原平台，不重复提交。招聘方回复、邀约、笔面、offer 和结束分别记实际状态。资格拒绝、无回复、技术缺口按 [反馈方法](材料与训练.md) 处理，下一动作需具体可执行。
 
-`chain.py status` 查看本地状态，`assistant.py report` 生成本地清单，`overview.py` 生成汇总。data 中的 SQLite 保留去重、操作回执和未完动作，不能为了清洁删除。
+`chain.py status` 查看本地状态，`assistant.py report` 生成本地清单，`workspace.py refresh` 刷新当前工作页（overview.py 为同一入口别名）。data 中的 SQLite 保留去重、操作回执和未完动作，不能为了清洁删除。
 
 ## 可选外部操作
 

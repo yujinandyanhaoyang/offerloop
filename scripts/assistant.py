@@ -280,6 +280,9 @@ def main():
         else: result = ledger.status()
         if args.sync_progress:
             result['progress_sync'] = publish_progress(ledger)
+        if c in {'import', 'finish', 'release', 'enqueue', 'recover', 'pause', 'resume'}:
+            from workspace import refresh_after_write
+            refresh_after_write()
         print(json.dumps(result, ensure_ascii=False, indent=2))
     except (ValueError, sqlite3.Error, OSError) as ex:
         print(json.dumps({'error': str(ex)}, ensure_ascii=False), file=sys.stderr)

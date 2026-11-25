@@ -469,7 +469,11 @@ def main(argv=None):
                 'ready': cmd_ready, 'apply': cmd_apply, 'run': cmd_run,
                 'submit': cmd_submit, 'followup': cmd_followup, 'check': cmd_check,
                 'shortlist': cmd_shortlist, 'prepare': cmd_prepare, 'status': cmd_status}
-    return dispatch[a.cmd](a)
+    result = dispatch[a.cmd](a)
+    if a.cmd != 'status' and result in (None, 0):
+        from workspace import refresh_after_write
+        refresh_after_write()
+    return result
 
 
 if __name__ == '__main__':

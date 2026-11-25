@@ -262,6 +262,9 @@ def main():
         r=p.claim(a.task_id) if a.cmd=='claim' else p.complete(a.batch_id,data) if a.cmd=='complete' else getattr(p,a.cmd)(a.job_id,data) if a.cmd in {'prepare','record','defer','track'} else getattr(p,a.cmd)()
         if a.sync_progress:
             r['progress_sync'] = publish_progress(p.l)
+        if a.cmd != 'plan':
+            from workspace import refresh_after_write
+            refresh_after_write()
         print(json.dumps(r,ensure_ascii=False,indent=2))
     except (ValueError,KeyError,OSError) as e:
         print(json.dumps({'error':str(e)},ensure_ascii=False));return 1

@@ -2,6 +2,8 @@
 import argparse
 import json
 import os
+import subprocess
+import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
@@ -60,7 +62,9 @@ def initialize(workspace=None):
         target = folder / (name + '.json')
         if write_missing(target, (REPO / 'config' / (name + '.example.json')).read_text(encoding='utf-8')):
             created.append(str(target))
-    for template in sorted((REPO / 'templates' / 'workspace').rglob('*.md')):
+    for template in sorted((REPO / 'templates' / 'workspace').rglob('*')):
+        if not template.is_file():
+            continue
         target = root / template.relative_to(REPO / 'templates' / 'workspace')
         values = {'METHODS': REPO / 'docs', 'HARNESS': REPO, 'PROFILE': personal / '投递数据.json',
                   'SCOPE': config / '当前检索范围.json', 'POLICY': config / '执行策略.json', 'DATA': home}
@@ -80,7 +84,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--workspace', type=Path, help='另一使用者的空目录；后续设置 OFFERLOOP_LOCAL')
     args = parser.parse_args()
-    print(json.dumps(initialize(args.workspace), ensure_ascii=False, indent=2))
+    result = initialize(args.workspace)
+    view = Path(result['workspace']) / 'memory/CURRENT_STATE.md'
+    if '<!-- offerloop:current-work -->' in view.read_text(encoding='utf-8-sig'):
+        done = subprocess.run([sys.executable, '-B', '-X', 'utf8', str(REPO / 'scripts/workspace.py'), 'refresh'],
+            env=dict(os.environ, OFFERLOOP_LOCAL=result['manifest']), capture_output=True, text=True, encoding='utf-8')
+        if done.returncode:
+            raise RuntimeError(done.stderr)
+        result['current_work'] = str(view)
+    else:
+        result['migration'] = '现有接续需先迁入统一工作状态，见 docs/工作闭环.md；未覆盖旧记忆。'
+    print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
 if __name__ == '__main__':

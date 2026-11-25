@@ -21,6 +21,12 @@ python -X utf8 scripts/interview_drill.py status
 
 零岗位、零训练是正常新实例。建档和接续流程见 [建档与接续](docs/建档与接续.md)。
 
+## 日常使用
+
+每次开始先运行 `python -X utf8 scripts/workspace.py refresh`，打开实例 memory/CURRENT_STATE.md。当前方向、实际检索范围、简历版本、企业岗位申请状态、笔面缺口和下一步在同一页显示。现有用户与新用户共用同一入口；方法和状态职责见 [工作闭环](docs/工作闭环.md)。
+
+每次工作结束先更新原台账或材料，再用 workspace.py close 更新现行决定。材料修改后未复审、范围与方向不一致、提交缺回执会直接提示，不能靠逐日文档猜进度。
+
 ## 组织方式
 
 | 部分 | 持续职责 |
@@ -32,7 +38,7 @@ python -X utf8 scripts/interview_drill.py status
 | scripts/ / tests/ / skills/ | 执行代码、验证和可选训练工作流 |
 | .local/profile/ | 唯一个人条件与偏好来源，四条线共同引用 |
 | 行业线 / 内容线 / 笔面线 / 投递线 | 初始化生成的个人现行判断、材料、训练与工作入口 |
-| memory/ | 下一会话需要的当前任务、未决条件和下一动作 |
+| memory/ | workspace.json 维护现行决定与材料状态；CURRENT_STATE.md 自动汇总当前工作 |
 | data/ | 本地台账、真实回执、去重和恢复状态 |
 
 个人目录、data 和 offerloop.local.json 均被 Git 忽略。相对路径以实例配置所在目录为基准。初始化只补缺失文件，重复运行不覆盖资料。方法就地更新，一次性研究提炼后清理，不按天生成报告或历史目录。

@@ -5,12 +5,7 @@ from datetime import date
 from pathlib import Path
 from config import SCOPE as CAMPAIGN, PROJECT_ROOT, REPO
 
-SCREENING_RULES = next(
-    (PROJECT_ROOT / directory / 'AI时代公司与岗位过滤器.md'
-     for directory in ('行业线', '规则')
-     if (PROJECT_ROOT / directory / 'AI时代公司与岗位过滤器.md').is_file()),
-    REPO / 'docs' / '岗位筛选规则.md',
-)
+SCREENING_RULES = REPO / 'docs' / '岗位筛选规则.md'
 
 
 def read_campaign(path=CAMPAIGN):

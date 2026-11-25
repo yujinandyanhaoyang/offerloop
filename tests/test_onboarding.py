@@ -93,7 +93,7 @@ class OnboardingTests(unittest.TestCase):
         self.assertEqual(self.run_cli('interview_drill.py', 'status')['total'], 1)
         (self.repo / '内容线/简历.md').write_text('# 合成测试简历\n仅供测试。', encoding='utf-8')
         memory = self.repo / 'memory/CURRENT_STATE.md'
-        memory.write_text('# 当前接续\n下一动作：复验设备排查题，核对 APP-FIXTURE 原 JD。', encoding='utf-8')
+        self.run_cli('workspace.py', 'close', '--json', '-', payload={'source':'synthetic continuation', 'updates':{'next_actions':['复验设备排查题，核对 APP-FIXTURE 原 JD。']}})
         snapshots = {p: p.read_bytes() for p in [profile, memory, self.repo / '内容线/简历.md',
                                                 self.repo / 'data/interview-ledger.json']}
         self.run_cli('setup.py')
@@ -170,7 +170,7 @@ class OnboardingTests(unittest.TestCase):
                 content = path.read_text(encoding='utf-8')
                 self.assertNotIn('{{', content)
                 for link in re.findall(r'\]\(([^)]+)\)', content):
-                    target = (path.parent / link).resolve()
+                    target = (path.parent / link.strip('<>')).resolve()
                     # The data directory is runtime-created, not a broken document link.
                     if target == self.repo / 'data':
                         continue
@@ -185,3 +185,62 @@ class OnboardingTests(unittest.TestCase):
             check = subprocess.run(['git', 'check-ignore', folder + '/README.md'], cwd=self.repo,
                                    capture_output=True, encoding='utf-8')
             self.assertEqual(check.returncode, 0)
+
+    def test_weekly_work_view_detects_scope_profile_and_resume_drift(self):
+        import hashlib
+        self.run_cli('setup.py')
+        resume = self.repo / '内容线/简历.md'
+        resume.write_text('Synthetic resume v1', encoding='utf-8')
+        h = hashlib.sha256(resume.read_bytes()).hexdigest()
+        self.run_cli('workspace.py', 'close', '--json', '-', payload={
+            'source': 'synthetic user confirmed this exact resume and direction',
+            'align_scope': True,
+            'updates': {'direction': {'status': '已确认', 'primary': ['设备应用'], 'parallel': [], 'deferred': [],
+                                      'reason': 'fixture only'},
+                        'materials': [{'path': '内容线/简历.md', 'label': '当前简历', 'status': '可投',
+                                       'reviewed_sha256': h, 'note': 'synthetic explicit confirmation'}],
+                        'next_actions': ['准备设备岗位面试']}})
+        view = self.repo / 'memory/CURRENT_STATE.md'
+        self.assertIn('设备应用', view.read_text(encoding='utf-8'))
+        self.assertEqual(self.run_cli('workspace.py', 'status')['materials'][0]['effective_status'], '可投')
+        resume.write_text('Synthetic resume v2 - not reviewed', encoding='utf-8')
+        self.assertIn('需重新审阅', self.run_cli('workspace.py', 'status')['materials'][0]['effective_status'])
+        scope = self.repo / '.local/config/当前检索范围.json'
+        d=self.load(scope);d['id']='changed-scope';scope.write_text(json.dumps(d),encoding='utf-8')
+        self.run_cli('onboard.py', 'apply', '--json', '-', payload={
+            'source':'synthetic new preference','updates':{'career_preferences':{'preferred_regions':['不限']}}})
+        text=view.read_text(encoding='utf-8')
+        self.assertIn('检索配置已改变', text)
+        self.assertIn('个人条件已更新', text)
+        self.assertIn('内容已变化', text)
+        self.assertIn('准备设备岗位面试', text)
+        self.run_cli('setup.py')
+        self.assertEqual(view.read_text(encoding='utf-8'),text)
+
+    def test_intake_and_training_refresh_view_without_network_or_reimport(self):
+        self.run_cli('setup.py')
+        self.run_cli('interview_drill.py','add','--json','-',payload={
+            'qid':'Q1','date':'2026-01-01','source':'模拟','company':'fixture',
+            'question':'fixture question','answer_status':'不会'})
+        view=(self.repo/'memory/CURRENT_STATE.md').read_text(encoding='utf-8')
+        self.assertIn('已记录 1 次作答',view)
+        status=self.run_cli('workspace.py','status')
+        self.assertEqual(status['ledger']['receipt_events'],0)
+        # An existing hand-written memory cannot be erased by a refresh.
+        p=self.repo/'memory/CURRENT_STATE.md';p.write_text('Unmigrated unique context',encoding='utf-8')
+        self.run_cli('workspace.py','refresh',success=False)
+        self.assertEqual(p.read_text(encoding='utf-8'),'Unmigrated unique context')
+        self.run_cli('setup.py')
+        self.assertEqual(p.read_text(encoding='utf-8'),'Unmigrated unique context')
+
+    def test_material_paths_and_current_status_updates_are_bounded(self):
+        self.run_cli('setup.py')
+        path=self.repo/'memory/workspace.json'
+        before=path.read_bytes()
+        for update in [
+            {'materials':[{'path':'../../another-user/resume.md'}]},
+            {'materials':[{'path':'内容线/简历.md','status':'可投'}]},
+            {'applications':[{'stage':'submitted'}]}]:
+            self.run_cli('workspace.py','close','--json','-',success=False,
+                         payload={'source':'fixture','updates':update})
+            self.assertEqual(path.read_bytes(),before)

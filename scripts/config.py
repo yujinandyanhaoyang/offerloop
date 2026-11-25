@@ -63,6 +63,9 @@ POLICY = CONFIG / '执行策略.json'
 SCOPE = CONFIG / '当前检索范围.json'
 PROFILE = PERSONAL / '投递数据.json'
 RESUME = _resolve('resume', 'OFFERLOOP_RESUME', PERSONAL / 'resume.md')
+INTERVIEW_LEDGER = _resolve('interview_ledger', 'OFFERLOOP_INTERVIEW_LEDGER', HOME / 'interview-ledger.json')
+INTERVIEW_BATCHES = _resolve('interview_batches', 'OFFERLOOP_INTERVIEW_BATCHES', HOME / 'batches')
+INTERVIEW_BATCH_PATTERN = _cfg.get('interview_batch_pattern', 'batch-{batch:02d}.md')
 ATTACHMENTS = _resolve('attachments', 'OFFERLOOP_ATTACHMENTS', HOME)
 READY_OUTPUT = HOME / '投递清单.md'
 

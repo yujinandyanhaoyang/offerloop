@@ -87,6 +87,8 @@ def main():
     else:
         raw = sys.stdin.read() if args.json == '-' else Path(args.json).read_text(encoding='utf-8-sig')
         result = apply(PROFILE, json.loads(raw))
+        from workspace import refresh_after_write
+        refresh_after_write()
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
