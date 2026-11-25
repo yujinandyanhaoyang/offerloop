@@ -8,7 +8,7 @@
 
 > 请按 AGENTS.md 初始化 OfferLoop。我是新用户，请通过对话了解我的背景和求职需求，建立档案，然后开始我当前最需要的工作。
 
-助手将创建四条线和 memory，分几轮询问必要信息，不要求手动填 JSON，不要求先配置飞书或浏览器。联网研究需要助手具备搜索能力，未接入时仍可先整理个人证据和材料。初始化脚本自身不提供聊天模型。
+助手将创建个人档案、当前状态和材料目录，分几轮询问必要信息，不要求手动填 JSON，不要求先配置飞书或浏览器。联网研究需要助手具备搜索能力，未接入时仍可先整理个人证据和材料。初始化脚本自身不提供聊天模型。
 
 手动检查也可运行：
 
@@ -35,12 +35,12 @@ python -X utf8 scripts/interview_drill.py status
 offerloop/
 ├── AGENTS.md / README.md
 ├── scripts/  docs/  config/  templates/  tests/  skills/
-├── 行业线/  内容线/  笔面线/  投递线/
+├── 内容线/  笔面线/
 ├── memory/
 └── .local/  data/  offerloop.local.json
 ```
 
-四条线和个人数据由初始化生成并被 Git 忽略，所有使用者采用同样的目录职责。
+四条线是工作职责，不对应四套目录与规则。内容线、笔面线和个人状态由初始化生成并被 Git 忽略；行业和投递直接使用 docs/ 中的方法、统一状态与台账，不再生成只有路由作用的一级目录。
 
 ## 组织方式
 
@@ -48,11 +48,13 @@ offerloop/
 | --- | --- |
 | AGENTS.md / README.md | 助手约定与用户入口 |
 | docs/ | 可复用筛选、背调、材料与训练方法，工具说明 |
-| templates/workspace/ | 四条线与接续记忆的空模板，初始化时生成私有工作文件 |
+| templates/workspace/ | 材料、笔面入口与接续记忆的空模板，初始化时生成私有工作文件 |
 | config/ | 通用平台适配与 example 模板 |
 | scripts/ / tests/ / skills/ | 执行代码、验证和可选训练工作流 |
 | .local/profile/ | 唯一个人条件与偏好来源，四条线共同引用 |
-| 行业线 / 内容线 / 笔面线 / 投递线 | 初始化生成的个人现行判断、材料、训练与工作入口 |
+| .local/config/ | 当前检索范围、执行策略与选用的面经研究配置 |
+| 内容线/ | 现用简历、项目卡及仍待处理的评审批注，通用方法放 docs/ |
+| 笔面线/ | 真实题源、原始作答和复验材料，缺口状态只维护训练台账 |
 | memory/ | workspace.json 维护现行决定与材料状态；CURRENT_STATE.md 自动汇总当前工作 |
 | data/ | 本地台账、真实回执、去重和恢复状态 |
 
@@ -68,7 +70,7 @@ offerloop/
 
 ## 接续和换设备
 
-新会话先读 AGENTS 和实例 memory/CURRENT_STATE.md，再进对应工作线，不需要旧会话记录。换设备只拉代码可开始新档案；继续原用户必须另行私下恢复 offerloop.local.json、.local、四条线、memory 和 data。SQLite 做一致性备份或停写后复制，浏览器和飞书重新认证。不要把个人资料提交到公开 Git。
+新会话先读 AGENTS 和实例 memory/CURRENT_STATE.md，再打开该任务的现用材料，不需要旧会话记录。换设备只拉代码可开始新档案；继续原用户必须另行私下恢复 offerloop.local.json、.local、内容线、笔面线、memory 和配置指向的台账目录。旧实例另有仍被引用的材料时一并恢复。SQLite 做一致性备份或停写后复制，浏览器和飞书重新认证。不要把个人资料提交到公开 Git。
 
 同机多用户用 `setup.py --workspace <独立目录>`，之后设置 OFFERLOOP_LOCAL 指向该目录的配置。仓库根目录就是工作根目录，无需额外嵌套 harness 文件夹。
 

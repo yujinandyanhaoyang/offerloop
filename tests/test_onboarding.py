@@ -165,7 +165,9 @@ class OnboardingTests(unittest.TestCase):
 
     def test_generated_links_and_git_exclusion(self):
         self.run_cli('setup.py')
-        for folder in ('行业线', '内容线', '笔面线', '投递线', 'memory'):
+        for obsolete in ('行业线', '投递线'):
+            self.assertFalse((self.repo / obsolete).exists())
+        for folder in ('内容线', '笔面线', 'memory'):
             for path in (self.repo / folder).glob('*.md'):
                 content = path.read_text(encoding='utf-8')
                 self.assertNotIn('{{', content)
