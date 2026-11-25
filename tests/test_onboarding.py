@@ -47,7 +47,7 @@ class OnboardingTests(unittest.TestCase):
 
     def test_new_user_conversation_research_training_and_resume_on_new_device(self):
         self.run_cli('setup.py')
-        profile = self.repo / '.local/profile/投递数据.json'
+        profile = self.repo / 'workspace/profile/投递数据.json'
         initial = self.load(profile)
         self.assertIsNone(initial['eligibility']['social_insurance'])
         self.assertEqual(initial['career_preferences']['primary_role'], '')
@@ -67,15 +67,15 @@ class OnboardingTests(unittest.TestCase):
         facts = self.load(profile)
         self.assertEqual([x['kind'] for x in facts['work_experience']], ['internship', 'formal'])
         self.assertIsNone(facts['eligibility']['social_insurance'])
-        self.assertEqual(self.load(self.repo / '.local/config/当前检索范围.json')['status'], 'draft')
+        self.assertEqual(self.load(self.repo / 'workspace/config/当前检索范围.json')['status'], 'draft')
 
         scope = {'id': 'fixture', 'status': 'confirmed', 'confirmation_reference': 'synthetic explicit user request',
                  'external_actions_enabled': False, 'cells': [
                      {'id': 'equipment', 'industry_id': 'manufacturing', 'industry': '设备制造',
                       'city': '南京', 'role_terms': ['设备维护']}]}
-        (self.repo / '.local/config/当前检索范围.json').write_text(json.dumps(scope), encoding='utf-8')
+        (self.repo / 'workspace/config/当前检索范围.json').write_text(json.dumps(scope), encoding='utf-8')
         self.assertEqual(self.run_cli('pipeline.py', 'plan')['action'], 'discover')
-        jobs = self.repo / '.local/jobs.json'
+        jobs = self.repo / 'workspace/jobs.json'
         jobs.write_text(json.dumps([{'id': 'APP-FIXTURE', 'company': '虚构测试公司', 'title': '设备维护',
             'city': '南京', 'source_url': 'https://example.org/jobs/fixture', 'source_level': 'primary_full',
             'observed_on': '2026-01-01', 'summary': '仅用于离线验证', 'next_action': '核实原JD'}]), encoding='utf-8')
@@ -86,11 +86,11 @@ class OnboardingTests(unittest.TestCase):
             'qid': 'FIXTURE-Q1', 'date': '2026-01-01', 'source': '模拟题', 'company': '虚构测试公司',
             'question': '说明一次设备故障排查', 'answer_status': '部分答出', '我的原始回答': '先查看故障日志。'})
         self.assertEqual(self.run_cli('interview_drill.py', 'status')['total'], 1)
-        (self.repo / '内容线/简历.md').write_text('# 合成测试简历\n仅供测试。', encoding='utf-8')
-        memory = self.repo / 'memory/CURRENT_STATE.md'
+        (self.repo / 'workspace/内容线/简历.md').write_text('# 合成测试简历\n仅供测试。', encoding='utf-8')
+        memory = self.repo / 'workspace/memory/CURRENT_STATE.md'
         self.run_cli('workspace.py', 'close', '--json', '-', payload={'source':'synthetic continuation', 'updates':{'next_actions':['复验设备排查题，核对 APP-FIXTURE 原 JD。']}})
-        snapshots = {p: p.read_bytes() for p in [profile, memory, self.repo / '内容线/简历.md',
-                                                self.repo / 'data/interview-ledger.json']}
+        snapshots = {p: p.read_bytes() for p in [profile, memory, self.repo / 'workspace/内容线/简历.md',
+                                                self.repo / 'workspace/data/interview-ledger.json']}
         self.run_cli('setup.py')
         for path, content in snapshots.items():
             self.assertEqual(path.read_bytes(), content)
@@ -100,12 +100,12 @@ class OnboardingTests(unittest.TestCase):
         self.assertEqual(self.run_cli('onboard.py', 'status', repo=moved)['stage'], 'ready_for_research')
         self.assertEqual(self.run_cli('chain.py', 'status', repo=moved)['ledger']['jobs_total'], 1)
         self.assertEqual(self.run_cli('interview_drill.py', 'status', repo=moved)['total'], 1)
-        self.assertIn('APP-FIXTURE', (moved / 'memory/CURRENT_STATE.md').read_text(encoding='utf-8'))
-        self.assertFalse(self.load(moved / '.local/config/执行策略.json')['external_actions_enabled'])
+        self.assertIn('APP-FIXTURE', (moved / 'workspace/memory/CURRENT_STATE.md').read_text(encoding='utf-8'))
+        self.assertFalse(self.load(moved / 'workspace/config/执行策略.json')['external_actions_enabled'])
 
     def test_other_user_unknown_direction_and_safe_reinitialization(self):
         self.run_cli('setup.py')
-        first_profile = self.repo / '.local/profile/投递数据.json'
+        first_profile = self.repo / 'workspace/profile/投递数据.json'
         before = first_profile.read_bytes()
         second = self.root / 'other-user'
         self.run_cli('setup.py', '--workspace', second)
@@ -117,7 +117,7 @@ class OnboardingTests(unittest.TestCase):
                         'capabilities': {'summary': '暂无项目，做过门店服务'}}})
         self.assertEqual(self.run_cli('onboard.py', 'status', env=env)['stage'], 'ready_for_research')
         self.assertEqual(first_profile.read_bytes(), before)
-        own_profile = second / '.local/profile/投递数据.json'
+        own_profile = second / 'profile/投递数据.json'
         before_second = own_profile.read_bytes()
         (second / '笔面线/README.md').unlink()  # Simulate interrupted initialization of disposable fixture.
         self.run_cli('setup.py', env=env)
@@ -153,7 +153,7 @@ class OnboardingTests(unittest.TestCase):
 
     def test_invalid_intake_does_not_change_profile_or_enable_actions(self):
         self.run_cli('setup.py')
-        path = self.repo / '.local/profile/投递数据.json'
+        path = self.repo / 'workspace/profile/投递数据.json'
         before = path.read_bytes()
         for payload in [
             {'updates': {'name': 'fixture'}},
@@ -172,13 +172,13 @@ class OnboardingTests(unittest.TestCase):
         for obsolete in ('行业线', '投递线'):
             self.assertFalse((self.repo / obsolete).exists())
         for folder in ('内容线', '笔面线', 'memory'):
-            for path in (self.repo / folder).glob('*.md'):
+            for path in (self.repo / 'workspace' / folder).glob('*.md'):
                 content = path.read_text(encoding='utf-8')
                 self.assertNotIn('{{', content)
                 for link in re.findall(r'\]\(([^)]+)\)', content):
                     target = (path.parent / link.strip('<>')).resolve()
                     # The data directory is runtime-created, not a broken document link.
-                    if target == self.repo / 'data':
+                    if target == self.repo / 'workspace/data':
                         continue
                     self.assertTrue(target.exists(), f'{path.name}: {link}')
         subprocess.run(['git', 'init', '-q', str(self.repo)], check=True, capture_output=True)
@@ -186,6 +186,7 @@ class OnboardingTests(unittest.TestCase):
                                 cwd=self.repo, capture_output=True, encoding='utf-8', check=True)
         self.assertNotIn('offerloop.local.json', result.stdout)
         self.assertNotIn('.local/', result.stdout)
+        self.assertFalse(any(line.startswith('?? workspace/') for line in result.stdout.splitlines()))
         self.assertNotIn('?? memory/CURRENT_STATE.md', result.stdout.splitlines())
         for folder in ('行业线', '内容线', '笔面线', '投递线'):
             check = subprocess.run(['git', 'check-ignore', folder + '/README.md'], cwd=self.repo,
@@ -195,7 +196,7 @@ class OnboardingTests(unittest.TestCase):
     def test_weekly_work_view_detects_scope_profile_and_resume_drift(self):
         import hashlib
         self.run_cli('setup.py')
-        resume = self.repo / '内容线/简历.md'
+        resume = self.repo / 'workspace/内容线/简历.md'
         resume.write_text('Synthetic resume v1', encoding='utf-8')
         h = hashlib.sha256(resume.read_bytes()).hexdigest()
         self.run_cli('workspace.py', 'close', '--json', '-', payload={
@@ -206,12 +207,12 @@ class OnboardingTests(unittest.TestCase):
                         'materials': [{'path': '内容线/简历.md', 'label': '当前简历', 'status': '可投',
                                        'reviewed_sha256': h, 'note': 'synthetic explicit confirmation'}],
                         'next_actions': ['准备设备岗位面试']}})
-        view = self.repo / 'memory/CURRENT_STATE.md'
+        view = self.repo / 'workspace/memory/CURRENT_STATE.md'
         self.assertIn('设备应用', view.read_text(encoding='utf-8'))
         self.assertEqual(self.run_cli('workspace.py', 'status')['materials'][0]['effective_status'], '可投')
         resume.write_text('Synthetic resume v2 - not reviewed', encoding='utf-8')
         self.assertIn('需重新审阅', self.run_cli('workspace.py', 'status')['materials'][0]['effective_status'])
-        scope = self.repo / '.local/config/当前检索范围.json'
+        scope = self.repo / 'workspace/config/当前检索范围.json'
         d=self.load(scope);d['id']='changed-scope';scope.write_text(json.dumps(d),encoding='utf-8')
         self.run_cli('onboard.py', 'apply', '--json', '-', payload={
             'source':'synthetic new preference','updates':{'career_preferences':{'preferred_regions':['不限']}}})
@@ -228,12 +229,12 @@ class OnboardingTests(unittest.TestCase):
         self.run_cli('interview_drill.py','add','--json','-',payload={
             'qid':'Q1','date':'2026-01-01','source':'模拟','company':'fixture',
             'question':'fixture question','answer_status':'不会'})
-        view=(self.repo/'memory/CURRENT_STATE.md').read_text(encoding='utf-8')
+        view=(self.repo/'workspace/memory/CURRENT_STATE.md').read_text(encoding='utf-8')
         self.assertIn('已记录 1 次作答',view)
         status=self.run_cli('workspace.py','status')
         self.assertEqual(status['ledger']['receipt_events'],0)
         # An existing hand-written memory cannot be erased by a refresh.
-        p=self.repo/'memory/CURRENT_STATE.md';p.write_text('Unmigrated unique context',encoding='utf-8')
+        p=self.repo/'workspace/memory/CURRENT_STATE.md';p.write_text('Unmigrated unique context',encoding='utf-8')
         self.run_cli('workspace.py','refresh',success=False)
         self.assertEqual(p.read_text(encoding='utf-8'),'Unmigrated unique context')
         self.run_cli('setup.py')
@@ -241,7 +242,7 @@ class OnboardingTests(unittest.TestCase):
 
     def test_material_paths_and_current_status_updates_are_bounded(self):
         self.run_cli('setup.py')
-        path=self.repo/'memory/workspace.json'
+        path=self.repo/'workspace/memory/workspace.json'
         before=path.read_bytes()
         for update in [
             {'materials':[{'path':'../../another-user/resume.md'}]},
@@ -250,3 +251,27 @@ class OnboardingTests(unittest.TestCase):
             self.run_cli('workspace.py','close','--json','-',success=False,
                          payload={'source':'fixture','updates':update})
             self.assertEqual(path.read_bytes(),before)
+
+    def test_artifact_paths_survive_workspace_move_without_rewriting_old_evidence(self):
+        self.run_cli('setup.py')
+        manifest = self.repo / 'workspace/offerloop.local.json'
+        settings = self.load(manifest)
+        old = 'C:/former-checkout/内容线/resume.md'
+        settings['artifact_relocations'] = {'C:/former-checkout/内容线': '内容线'}
+        manifest.write_text(json.dumps(settings), encoding='utf-8')
+        resume = self.repo / 'workspace/内容线/resume.md'
+        resume.write_text('synthetic submitted version', encoding='utf-8')
+        moved = self.root / 'relocated'
+        shutil.copytree(self.repo, moved)
+        probe = [sys.executable, '-B', '-X', 'utf8', '-c',
+            "import sys,json; sys.path.insert(0,'scripts'); "
+            "from config import recorded_path,artifact_reference; "
+            "p=recorded_path(sys.argv[1]); "
+            "print(json.dumps([str(p),artifact_reference(p),p.read_text(encoding='utf-8')]))", old]
+        result = subprocess.run(probe, cwd=moved, env=self.env, check=True,
+                                capture_output=True, text=True, encoding='utf-8')
+        path, reference, content = json.loads(result.stdout)
+        self.assertEqual(Path(path), moved / 'workspace/内容线/resume.md')
+        self.assertEqual(reference, '内容线/resume.md')
+        self.assertEqual(content, 'synthetic submitted version')
+        self.assertEqual(old, 'C:/former-checkout/内容线/resume.md')

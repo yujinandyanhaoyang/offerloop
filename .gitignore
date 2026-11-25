@@ -1,4 +1,5 @@
 # 数据与个人配置（不入库）
+/workspace/
 data/
 .local/
 offerloop.local.json

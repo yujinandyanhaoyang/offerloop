@@ -1,6 +1,6 @@
 """本地凭据加密存储（Windows DPAPI，仅当前 Windows 用户可解密）。
 
-凭据存 <实例根>/.local/credentials/<key>.bin（DPAPI 加密，无独立密钥文件，目录已 gitignore）。
+凭据存 <实例根>/runtime/credentials/<key>.bin（DPAPI 加密，无独立密钥文件，私有工作区不入 Git）。
 secret 走 stdin 传入，不经过命令行（避免进程列表泄露）。get 只供程序内部调用，禁止回显/写日志。
 
 用法：
@@ -14,7 +14,7 @@ import json
 import sys
 from config import PROJECT_ROOT
 
-DIR = PROJECT_ROOT / '.local' / 'credentials'
+DIR = PROJECT_ROOT / 'runtime' / 'credentials'
 LEGACY_DIR = PROJECT_ROOT / 'credentials'
 if not DIR.exists() and LEGACY_DIR.is_dir():
     DIR = LEGACY_DIR

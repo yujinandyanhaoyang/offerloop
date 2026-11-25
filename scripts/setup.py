@@ -39,12 +39,13 @@ def initialize(workspace=None):
         if not manifest.is_file():
             raise FileNotFoundError('OFFERLOOP_LOCAL 配置不存在，请修正或指定 --workspace')
     else:
-        manifest = next((p for p in (REPO / 'offerloop.local.json', REPO.parent / 'offerloop.local.json')
-                         if p.is_file()), REPO / 'offerloop.local.json')
+        manifest = next((p for p in (REPO / 'workspace' / 'offerloop.local.json',
+                                    REPO / 'offerloop.local.json', REPO.parent / 'offerloop.local.json')
+                         if p.is_file()), REPO / 'workspace' / 'offerloop.local.json')
     root = manifest.parent
-    settings = {'home': 'data', 'config': '.local/config', 'personal': '.local/profile',
+    settings = {'home': 'data', 'config': 'config', 'personal': 'profile',
                 'adapters': relative(BUNDLED_CONFIG, root),
-                'resume': '内容线/简历.md', 'attachments': '.local/profile'}
+                'resume': '内容线/简历.md', 'attachments': 'profile'}
     created = []
     if write_missing(manifest, json.dumps(settings, ensure_ascii=False, indent=2) + '\n'):
         created.append('offerloop.local.json')
@@ -57,8 +58,8 @@ def initialize(workspace=None):
         path = Path(value)
         return path.resolve() if path.is_absolute() else (root / path).resolve()
 
-    config = location('config', 'OFFERLOOP_CONFIG', '.local/config')
-    personal = location('personal', 'OFFERLOOP_PERSONAL', settings.get('config', '.local/config'))
+    config = location('config', 'OFFERLOOP_CONFIG', 'config')
+    personal = location('personal', 'OFFERLOOP_PERSONAL', 'profile')
     home = location('home', 'OFFERLOOP_HOME', 'data')
     for name, folder in [('执行策略', config), ('当前检索范围', config), ('投递数据', personal)]:
         target = folder / (name + '.json')

@@ -23,45 +23,38 @@ python -X utf8 scripts/interview_drill.py status
 
 ## 日常使用
 
-每次开始先运行 `python -X utf8 scripts/workspace.py refresh`，打开实例 memory/CURRENT_STATE.md。当前方向、实际检索范围、简历版本、企业岗位申请状态、笔面缺口和下一步在同一页显示。现有用户与新用户共用同一入口；方法和状态职责见 [工作闭环](docs/工作闭环.md)。
+每次开始先运行 `python -X utf8 scripts/workspace.py refresh`，打开实例 memory/CURRENT_STATE.md（默认 workspace/memory/CURRENT_STATE.md）。当前方向、实际检索范围、简历版本、企业岗位申请状态、笔面缺口和下一步在同一页显示。现有用户与新用户共用同一入口；方法和状态职责见 [工作闭环](docs/工作闭环.md)。
 
 每次工作结束先更新原台账或材料，再用 workspace.py close 更新现行决定。材料修改后未复审、范围与方向不一致、提交缺回执会直接提示，不能靠逐日文档猜进度。
 
 ## 目录组织
 
-代码、方法、空模板与个人工作线在同一个项目根目录。harness 是工作机制的名称，不再是包住另一套工程的目录。
+公共框架只保留一套；个人工作集中在 `workspace/`。harness 是工作机制，不再单独套一层目录。
 
 ```text
 offerloop/
 ├── AGENTS.md / README.md
-├── scripts/  docs/  tests/  skills/
-├── 内容线/  笔面线/
-├── memory/
-└── .local/  data/  offerloop.local.json
+├── docs/                 通用方法与操作说明
+│   └── 行业线/           研究渠道、筛选与企业背调
+├── scripts/              投递、材料、训练与状态工具
+│   ├── config/           平台适配及空配置示例
+│   └── templates/        初始化使用的空模板
+├── skills/               可复用的助手工作流
+├── tests/                框架验证
+└── workspace/            当前用户的私有实例，不入 Git
+    ├── offerloop.local.json
+    ├── profile/          唯一个人档案：条件、偏好与限制
+    ├── config/           本人的检索范围与执行配置
+    ├── 内容线/           现用简历、项目卡及待处理评审
+    ├── 笔面线/           真实题源、原始作答与复验材料
+    ├── memory/           现行决定与自动生成的当前工作页
+    ├── data/             台账、回执、去重与恢复状态
+    └── runtime/          按需生成的浏览器会话与本机认证
 ```
 
-四条线是工作职责，不对应四套目录与规则。内容线、笔面线和个人状态由初始化生成并被 Git 忽略；行业和投递直接使用 docs/ 中的方法、统一状态与台账，不再生成只有路由作用的一级目录。
+四条线是工作职责。行业研究方法直接使用 docs/行业线；投递能力直接使用 scripts、scripts/config 和执行手册。个人的方向取舍进入 memory，实际检索范围进入 config，具体岗位和进度进入 data 的台账。模板只用于初始化，日常不维护第二份个人文件。
 
-## 组织方式
-
-| 部分 | 持续职责 |
-| --- | --- |
-| AGENTS.md / README.md | 助手约定与用户入口 |
-| docs/行业线/ | 公开的行业研究渠道、报告读法、景气信号、筛选与背调方法；所有用户直接复用 |
-| docs/ 其他文件 | 材料与训练方法、投递执行手册和接续说明 |
-| scripts/templates/workspace/ | 初始化脚本使用的空模板；只定义新实例初始结构，不保存个人事实，日常不编辑模板 |
-| scripts/config/ | 公开的投递平台适配、字段映射、执行策略与个人资料的空配置示例 |
-| scripts/ / tests/ / skills/ | 执行代码、验证和可选训练工作流 |
-| .local/profile/ | 当前实例的个人条件与偏好；不承载通用行业方法或公共行业知识 |
-| .local/config/ | 当前检索范围、执行策略与选用的面经研究配置 |
-| 内容线/ | 现用简历、项目卡及仍待处理的评审批注，通用方法放 docs/ |
-| 笔面线/ | 真实题源、原始作答和复验材料，缺口状态只维护训练台账 |
-| memory/ | workspace.json 维护现行决定与材料状态；CURRENT_STATE.md 自动汇总当前工作 |
-| data/ | 本地台账、真实回执、去重和恢复状态 |
-
-个人目录、data 和 offerloop.local.json 均被 Git 忽略。相对路径以实例配置所在目录为基准。初始化只补缺失文件，重复运行不覆盖资料。方法就地更新，一次性研究提炼后清理，不按天生成报告或历史目录。
-
-上述是当前已实现的布局；个人资料收敛到唯一 workspace 的整体迁移尚未完成，不能把旧 .local 整包改名当作整理结束。
+实例内相对路径以 offerloop.local.json 所在目录为基准。初始化只补缺失文件，重复运行不覆盖资料。一次性研究用完即提炼进现行文档并清理，不另建日期报告、历史目录或 .local 缓存库。真实回执和未完成动作按恢复用途保留。
 
 ## 行业线与投递线在哪里
 
@@ -81,7 +74,7 @@ offerloop/
 
 ## 接续和换设备
 
-新会话先读 AGENTS 和实例 memory/CURRENT_STATE.md，再打开该任务的现用材料，不需要旧会话记录。换设备只拉代码可开始新档案；继续原用户必须另行私下恢复 offerloop.local.json、.local、内容线、笔面线、memory 和配置指向的台账目录。旧实例另有仍被引用的材料时一并恢复。SQLite 做一致性备份或停写后复制，浏览器和飞书重新认证。不要把个人资料提交到公开 Git。
+新会话先读 AGENTS 和实例 memory/CURRENT_STATE.md（默认 workspace/memory/CURRENT_STATE.md），再打开该任务的现用材料，不需要旧会话记录。换设备只拉代码可开始新档案；继续原用户需通过私有渠道恢复整个 workspace，再运行 setup.py 和 workspace.py refresh。SQLite 做一致性备份或停写后复制；浏览器和加密凭据可能绑定设备，需要重新认证。不要把个人资料提交到公开 Git。
 
 同机多用户用 `setup.py --workspace <独立目录>`，之后设置 OFFERLOOP_LOCAL 指向该目录的配置。仓库根目录就是工作根目录，无需额外嵌套 harness 文件夹。
 

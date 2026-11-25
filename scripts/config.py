@@ -1,9 +1,9 @@
 """OfferLoop 路径配置。
 
 优先级：环境变量 > 本地实例配置 offerloop.local.json > 通用默认。
-- 本地实例：<repo>/offerloop.local.json 或 <repo>/../offerloop.local.json（相对路径按该文件所在目录解析）
-- OFFERLOOP_HOME      数据目录（台账/证据/回执，不入库），默认 <repo>/data
-- OFFERLOOP_CONFIG    个人执行配置目录，默认 <repo>/.local/config
+- 本地实例：<repo>/workspace/offerloop.local.json；兼容原根目录配置。相对路径按配置所在目录解析。
+- OFFERLOOP_HOME      数据目录（台账/证据/回执，不入库），默认 <repo>/workspace/data
+- OFFERLOOP_CONFIG    个人执行配置目录，默认 <repo>/workspace/config
 - OFFERLOOP_ADAPTERS  通用平台适配配置，默认 <repo>/scripts/config
 """
 import json
@@ -17,7 +17,7 @@ BUNDLED_CONFIG = HERE / 'config'             # 公开适配与空配置，不能
 _LOCAL = None
 _override = os.environ.get('OFFERLOOP_LOCAL')
 _candidates = (Path(_override),) if _override else (
-    REPO / 'offerloop.local.json', REPO.parent / 'offerloop.local.json')
+    REPO / 'workspace' / 'offerloop.local.json', REPO / 'offerloop.local.json', REPO.parent / 'offerloop.local.json')
 for _cand in _candidates:
     if _cand.is_file():
         _LOCAL = _cand
@@ -26,7 +26,7 @@ if _override and _LOCAL is None:
     raise FileNotFoundError(f'OFFERLOOP_LOCAL does not exist: {_override}')
 
 _cfg = {}
-_base = REPO
+_base = REPO / 'workspace'
 if _LOCAL is not None:
     _cfg = json.loads(_LOCAL.read_text(encoding='utf-8'))
     _base = _LOCAL.resolve().parent
@@ -43,17 +43,37 @@ def _resolve(key, env_name, default):
     return default.resolve()
 
 
-HOME = _resolve('home', 'OFFERLOOP_HOME', REPO / 'data')
-CONFIG = _resolve('config', 'OFFERLOOP_CONFIG', REPO / '.local' / 'config')
+HOME = _resolve('home', 'OFFERLOOP_HOME', _base / 'data')
+CONFIG = _resolve('config', 'OFFERLOOP_CONFIG', _base / 'config')
 ADAPTERS = _resolve('adapters', 'OFFERLOOP_ADAPTERS', BUNDLED_CONFIG)
 if (not os.environ.get('OFFERLOOP_ADAPTERS') and ADAPTERS == (REPO / 'config').resolve()
         and not ADAPTERS.exists()):
     # Only the former built-in location has moved; never redirect a custom adapter directory.
     ADAPTERS = BUNDLED_CONFIG
-PERSONAL = _resolve('personal', 'OFFERLOOP_PERSONAL', REPO / '.local' / 'profile')
+PERSONAL = _resolve('personal', 'OFFERLOOP_PERSONAL', _base / 'profile')
 
-# 项目实例根：offerloop.local.json 所在目录（无本地配置时退回项目根目录）
+# 项目实例根：offerloop.local.json 所在目录（默认 workspace）
 PROJECT_ROOT = _base
+
+
+def recorded_path(value):
+    """Resolve saved artifact locations without rewriting historical event evidence."""
+    normalized = str(value).replace('\\', '/')
+    for old, new in sorted(_cfg.get('artifact_relocations', {}).items(), key=lambda p: -len(p[0])):
+        old = old.replace('\\', '/').rstrip('/')
+        if normalized == old or normalized.startswith(old + '/'):
+            target = (PROJECT_ROOT / new / normalized[len(old):].lstrip('/')).resolve()
+            if not target.is_relative_to(PROJECT_ROOT.resolve()):
+                raise ValueError('artifact relocation must stay inside workspace')
+            return target
+    path = Path(value)
+    return path if path.is_absolute() else PROJECT_ROOT / path
+
+
+def artifact_reference(path):
+    """New records use portable workspace-relative paths when possible."""
+    path = Path(path).resolve()
+    return path.relative_to(PROJECT_ROOT.resolve()).as_posix() if path.is_relative_to(PROJECT_ROOT.resolve()) else str(path)
 
 # 数据（运行时/个人，不入库）
 LEDGER = HOME / 'ledger.sqlite3'

@@ -7,7 +7,7 @@ from pathlib import Path
 from assistant import Ledger, DEFAULT_DB, PROJECT, stamp, canonical_url
 from scope import read_campaign, validate, fingerprint, eligible, search_plan
 
-from config import POLICY
+from config import POLICY, recorded_path, artifact_reference
 
 
 class Pipeline:
@@ -171,7 +171,7 @@ class Pipeline:
             old=self.db.execute('SELECT stage FROM applications WHERE job_id=?',(jid,)).fetchone()
             if old and old[0] not in {'ready','closed'}: raise ValueError('cannot overwrite active application')
             self.db.execute('INSERT OR REPLACE INTO applications VALUES(?,?,?,?,?,?,?,?)',
-                (jid,row['revision'],'ready',str(path),digest,json.dumps(data,ensure_ascii=False),None,stamp()))
+                (jid,row['revision'],'ready',artifact_reference(path),digest,json.dumps(data,ensure_ascii=False),None,stamp()))
             self.l.event('application_prepared', {'job_id':jid,'resume_hash':digest,'evidence':data})
         return {'job_id':jid,'stage':'ready','resume_hash':digest,'external_send':False}
 
@@ -189,7 +189,7 @@ class Pipeline:
             old = self.db.execute('SELECT stage FROM applications WHERE job_id=?', (jid,)).fetchone()
             if old and old[0] not in {'ready', 'closed'}: raise ValueError('cannot overwrite active application')
             self.db.execute('INSERT OR REPLACE INTO applications VALUES(?,?,?,?,?,?,?,?)',
-                (jid, row['revision'], 'ready', str(path), digest, json.dumps(data, ensure_ascii=False), None, stamp()))
+                (jid, row['revision'], 'ready', artifact_reference(path), digest, json.dumps(data, ensure_ascii=False), None, stamp()))
             self.l.event('application_prepared', {'job_id': jid, 'resume_hash': digest, 'evidence': data})
         return {'job_id': jid, 'stage': 'ready', 'resume_hash': digest, 'external_send': False}
 
@@ -214,7 +214,7 @@ class Pipeline:
                 raise ValueError('submission requires real receipt and matching resume hash')
             if stage=='submitted':
                 rev=self.db.execute('SELECT revision FROM jobs WHERE id=?',(jid,)).fetchone()[0]
-                if rev!=r['revision'] or hashlib.sha256(Path(r['resume_path']).read_bytes()).hexdigest()!=r['resume_hash']:
+                if rev!=r['revision'] or hashlib.sha256(recorded_path(r['resume_path']).read_bytes()).hexdigest()!=r['resume_hash']:
                     raise ValueError('JD or resume changed; reconcile actual submitted version first')
             if stage=='ready' and not data.get('verified_not_sent'):
                 raise ValueError('unknown submission must be reconciled before retry')

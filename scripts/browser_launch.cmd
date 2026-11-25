@@ -3,7 +3,7 @@ rem Launch Chrome with remote debugging (CDP) on 127.0.0.1:9222 for OfferLoop ap
 rem Double-click THIS FILE in Windows Explorer. Do NOT click the link inside a web page.
 setlocal
 set "ROOT=%~dp0.."
-set "PROFILE=%ROOT%\.local\browser-profile"
+set "PROFILE=%ROOT%\workspace\runtime\browser-profile"
 set "CHROME=C:\Program Files\Google\Chrome\Application\chrome.exe"
 if not exist "%CHROME%" (
   echo [ERROR] Chrome not found: %CHROME%

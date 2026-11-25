@@ -1,8 +1,8 @@
 # 贡献指南
 
 ## 提交前
-- 不提交个人数据：姓名、手机、邮箱、简历、真实台账、`.local/` 下的私有证据。
-- 个人配置只改私有实例；通用适配器可改 config 中的公开配置，空模板使用 *.example.json。
+- 不提交个人数据：姓名、手机、邮箱、简历、真实台账、`workspace/` 下的私有材料。
+- 个人配置只改私有实例；通用适配器可改 scripts/config 中的公开配置，空模板使用 *.example.json。
 - 跑测试：`python -X utf8 -m unittest discover -s tests -p "test_*.py"`。
 
 ## 新增平台

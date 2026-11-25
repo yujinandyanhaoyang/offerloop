@@ -183,6 +183,12 @@ def render(data):
     out += ['', '## 笔面准备', '', f"已记录 {data['training']['total']} 次作答；尚待处理的缺口 {len(data['training']['gaps'])} 项。"]
     for gap in data['training']['gaps']:
         out.append('- ' + cell(gap.get('id')) + '：' + cell(gap.get('标题') or gap.get('问题') or gap.get('缺口') or gap.get('主题')) + '；' + cell(gap.get('补习状态')))
+        for action in gap.get('补习动作', []):
+            out.append('  - 补习：' + cell(action))
+        if gap.get('复验方式'):
+            out.append('  - 复验：' + cell(gap['复验方式']))
+    if INTERVIEW_LEDGER.is_file():
+        out.append('- 原始作答与完整缺口：' + link(INTERVIEW_LEDGER, '训练台账') + '。')
     for key, title in [('next_actions','下一步'),('open_questions','尚未确认'),('retained_constraints','恢复与执行约束')]:
         out += ['', '## ' + title, ''] + (['- ' + x for x in state.get(key,[])] or ['- 暂无记录。'])
     out += ['', '## 信息写到哪里', '',

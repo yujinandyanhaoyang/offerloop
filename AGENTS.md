@@ -2,8 +2,8 @@
 
 先读 [README](README.md)，执行 `python -X utf8 scripts/setup.py`，再按 [建档与接续](docs/建档与接续.md) 判断是新用户还是已有实例。用户无需预先填写 JSON，也不依赖某个 AI 厂商、全局 skill 或旧会话。
 
-- 通用方法、代码和空模板在 Git 中。个人条件与偏好只维护在实例 `personal/投递数据.json`；四条线引用同一档案。路径以 `offerloop.local.json` 和 `scripts/config.py` 为准，禁止猜测另一台设备的绝对路径。
-- 所有用户先运行 `scripts/workspace.py refresh` 并读取实例 `memory/CURRENT_STATE.md`，再按任务进入对应线。统一状态与收尾规则见 [工作闭环](docs/工作闭环.md)。只读影响当前判断的字段与材料，不扫描全历史。
+- 通用方法、代码和空模板在 Git 中。个人条件与偏好只维护在实例 `profile/投递数据.json`；四条线引用同一档案。路径以 `offerloop.local.json` 和 `scripts/config.py` 为准，禁止猜测另一台设备的绝对路径。
+- 所有用户先运行 `scripts/workspace.py refresh` 并读取实例 `memory/CURRENT_STATE.md`（默认 `workspace/memory/CURRENT_STATE.md`），再按任务进入对应线。统一状态与收尾规则见 [工作闭环](docs/工作闭环.md)。只读影响当前判断的字段与材料，不扫描全历史。
 - 行业线负责方向、企业与原 JD 准入。内容线负责简历和项目证据。笔面线负责题源、原始回答、纠偏和复验。投递线负责岗位状态、回执及反馈。通用方法在 `docs/行业线/岗位筛选规则.md`、`docs/行业线/企业背调方法论.md`、`docs/材料与训练.md`、`docs/RUNBOOK.md`。
 - 行业研究先读 `docs/行业线/行业研究方法.md`：研究渠道、报告读法、景气信号与可复用行业知识属于公共框架，不写入个人 profile 或给每人复制方法库。个人档案只记录本人条件、意向和限制，针对个人的推荐与岗位匹配分别进入当前状态和岗位台账。投递实现与通用配置在 `scripts/`、`scripts/config/`，技能只编排已有能力。
 - 不预设行业、岗位、地区、学历、就业状态或发展路线。本人陈述、直接核实、推断、未知分别记录。实习与正式工作分别计，资格按具体公告核对。已有授权持续有效，不重复询问。

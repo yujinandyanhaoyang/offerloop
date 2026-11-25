@@ -10,7 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const { selectTarget } = require('./browser_target');
 const CONFIG_DIR = process.env.OFFERLOOP_ADAPTERS || process.env.OFFERLOOP_CONFIG || path.join(__dirname, 'config');
-const DATA_DIR = process.env.OFFERLOOP_HOME || path.join(__dirname, '..', 'data');
+const DATA_DIR = process.env.OFFERLOOP_HOME || path.join(__dirname, '..', 'workspace', 'data');
 const PLATFORMS = JSON.parse(fs.readFileSync(path.join(CONFIG_DIR, 'platforms.json'), 'utf8'));
 const COMPANIES = JSON.parse(fs.readFileSync(path.join(CONFIG_DIR, 'companies.json'), 'utf8'));
 for (const [key, company] of Object.entries(COMPANIES)) {
